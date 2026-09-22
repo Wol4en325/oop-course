@@ -1,0 +1,15 @@
+D:\Unik\2kurs_OOP\ClinicApp\bin\Debug\net8.0\ClinicApp.exe
+D:\Unik\2kurs_OOP\ClinicApp\bin\Debug\net8.0\ClinicApp.deps.json
+D:\Unik\2kurs_OOP\ClinicApp\bin\Debug\net8.0\ClinicApp.runtimeconfig.json
+D:\Unik\2kurs_OOP\ClinicApp\bin\Debug\net8.0\ClinicApp.dll
+D:\Unik\2kurs_OOP\ClinicApp\bin\Debug\net8.0\ClinicApp.pdb
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.GeneratedMSBuildEditorConfig.editorconfig
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.AssemblyInfoInputs.cache
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.AssemblyInfo.cs
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.csproj.CoreCompileInputs.cache
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.sourcelink.json
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.dll
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\refint\ClinicApp.dll
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.pdb
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ClinicApp.genruntimeconfig.cache
+D:\Unik\2kurs_OOP\ClinicApp\obj\Debug\net8.0\ref\ClinicApp.dll
