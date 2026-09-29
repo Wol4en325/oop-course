@@ -1,4 +1,4 @@
-namespace ClinicApp;
+﻿namespace ClinicApp;
 
 public class Patient
 {
@@ -44,23 +44,6 @@ public class Patient
         }
     }
 
-    public Patient()
-    {
-        Id = _nextId++;
-        FirstName = "";
-        LastName = "";
-        DateOfBirth = DateTime.Today;
-        BloodType = "";
-        Phone = "";
-        Email = "";
-    }
-
-    public Patient(string firstName, string lastName) : this()
-    {
-        FirstName = firstName;
-        LastName = lastName;
-    }
-
     public Patient(string firstName, string lastName, DateTime dateOfBirth, string bloodType, string phone)
     {
         Id = _nextId++;
@@ -70,6 +53,16 @@ public class Patient
         BloodType = bloodType;
         Phone = phone;
         Email = "";
+    }
+
+    public Patient()
+        : this("", "", DateTime.Today, "", "")
+    {
+    }
+
+    public Patient(string firstName, string lastName)
+        : this(firstName, lastName, DateTime.Today, "", "")
+    {
     }
 
     public string GetAgeCategory()
@@ -92,3 +85,6 @@ public class Patient
         return "[" + Id + "] " + FullName + " | Age: " + Age + " (" + GetAgeCategory() + ") | Blood: " + BloodType + " | Phone: " + Phone;
     }
 }
+
+
+

@@ -45,25 +45,6 @@ public class Doctor
         }
     }
 
-    public Doctor()
-    {
-        Id = _nextId++;
-        FirstName = "";
-        LastName = "";
-        Speciality = "";
-        LicenseNumber = "";
-        Phone = "";
-        WorkStartHour = 8;
-        WorkEndHour = 17;
-    }
-
-    public Doctor(string firstName, string lastName, string speciality) : this()
-    {
-        FirstName = firstName;
-        LastName = lastName;
-        Speciality = speciality;
-    }
-
     public Doctor(string firstName, string lastName, string speciality, string licenseNumber, string phone)
     {
         Id = _nextId++;
@@ -74,6 +55,16 @@ public class Doctor
         Phone = phone;
         WorkStartHour = 8;
         WorkEndHour = 17;
+    }
+
+    public Doctor()
+        : this("", "", "", "", "")
+    {
+    }
+
+    public Doctor(string firstName, string lastName, string speciality)
+        : this(firstName, lastName, speciality, "", "")
+    {
     }
 
     public bool CanAcceptAt(int hour)
