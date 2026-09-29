@@ -75,3 +75,54 @@ Console.WriteLine(doctor1);
 Console.WriteLine(doctor2);
 Console.WriteLine(doctor3);
 Console.WriteLine(doctor4);
+
+PatientManager patientManager = new PatientManager();
+
+patientManager.Add(patient1);
+patientManager.Add(patient2);
+patientManager.Add(patient3);
+patientManager.Add(patient4);
+patientManager.Add(patient5);
+
+patientManager.DisplayAll();
+patientManager.DisplayStats();
+
+Console.WriteLine();
+Console.WriteLine("=== Search ===");
+
+Patient[] foundPatients = patientManager.FindByName("John");
+
+for (int i = 0; i < foundPatients.Length; i++)
+{
+    Console.WriteLine(foundPatients[i]);
+}
+
+Console.WriteLine();
+Console.WriteLine("=== Find By ID ===");
+
+Patient? foundPatient = patientManager.FindById(3);
+
+if (foundPatient == null)
+{
+    Console.WriteLine("Patient not found.");
+}
+else
+{
+    Console.WriteLine(foundPatient);
+}
+
+Console.WriteLine();
+Console.WriteLine("=== Remove ===");
+
+bool removed = patientManager.Remove(2);
+
+if (removed)
+{
+    Console.WriteLine("Patient removed.");
+}
+else
+{
+    Console.WriteLine("Patient not found.");
+}
+
+patientManager.DisplayAll();
