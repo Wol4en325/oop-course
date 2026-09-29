@@ -126,3 +126,53 @@ else
 }
 
 patientManager.DisplayAll();
+
+DoctorManager doctorManager = new DoctorManager();
+
+doctorManager.Add(doctor1);
+doctorManager.Add(doctor2);
+doctorManager.Add(doctor3);
+doctorManager.Add(doctor4);
+
+doctorManager.DisplayAll();
+doctorManager.DisplayStats();
+
+Console.WriteLine();
+Console.WriteLine("=== Search By Speciality ===");
+
+Doctor[] foundDoctors = doctorManager.FindBySpeciality("Cardiology");
+
+for (int i = 0; i < foundDoctors.Length; i++)
+{
+    Console.WriteLine(foundDoctors[i]);
+}
+
+Console.WriteLine();
+Console.WriteLine("=== Find Doctor By ID ===");
+
+Doctor? foundDoctor = doctorManager.FindById(3);
+
+if (foundDoctor == null)
+{
+    Console.WriteLine("Doctor not found.");
+}
+else
+{
+    Console.WriteLine(foundDoctor);
+}
+
+Console.WriteLine();
+Console.WriteLine("=== Remove Doctor ===");
+
+bool doctorRemoved = doctorManager.Remove(4);
+
+if (doctorRemoved)
+{
+    Console.WriteLine("Doctor removed.");
+}
+else
+{
+    Console.WriteLine("Doctor not found.");
+}
+
+doctorManager.DisplayAll();
