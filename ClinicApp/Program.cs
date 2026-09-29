@@ -237,3 +237,132 @@ Console.WriteLine();
 Console.WriteLine(appointment1);
 Console.WriteLine(appointment2);
 Console.WriteLine(appointment3);
+
+Console.WriteLine();
+Console.WriteLine("=== Appointment Manager ===");
+
+AppointmentManager appointmentManager = new AppointmentManager(
+    patientManager,
+    doctorManager
+);
+
+appointmentManager.Book(
+    patient1.Id,
+    doctor1.Id,
+    DateTime.Now.AddDays(1).Date.AddHours(10),
+    30
+);
+
+appointmentManager.Book(
+    patient3.Id,
+    doctor2.Id,
+    DateTime.Now.AddDays(1).Date.AddHours(11),
+    45
+);
+
+appointmentManager.Book(
+    patient5.Id,
+    doctor3.Id,
+    DateTime.Now.AddDays(2).Date.AddHours(9),
+    20
+);
+
+appointmentManager.Book(
+    99,
+    doctor1.Id,
+    DateTime.Now.AddDays(1).Date.AddHours(12),
+    30
+);
+
+Console.WriteLine();
+Console.WriteLine("=== Upcoming Appointments ===");
+
+Appointment[] upcomingAppointments = appointmentManager.GetUpcoming();
+appointmentManager.DisplayList(upcomingAppointments);
+
+Console.WriteLine();
+Console.WriteLine("=== Patient Appointments ===");
+
+Appointment[] patientAppointments = appointmentManager.GetByPatient(patient3.Id);
+appointmentManager.DisplayList(patientAppointments);
+
+Console.WriteLine();
+Console.WriteLine("=== Doctor Appointments ===");
+
+Appointment[] doctorAppointments = appointmentManager.GetByDoctor(doctor1.Id);
+appointmentManager.DisplayList(doctorAppointments);
+
+Console.WriteLine();
+Console.WriteLine("=== Appointments By Date ===");
+
+Appointment[] dateAppointments = appointmentManager.GetByDate(
+    DateTime.Now.AddDays(1).Date
+);
+appointmentManager.DisplayList(dateAppointments);
+
+Console.WriteLine();
+Console.WriteLine("=== Cancel Appointment ===");
+
+bool appointmentCancelled = appointmentManager.Cancel(
+    1,
+    "Patient could not come."
+);
+
+if (appointmentCancelled)
+{
+    Console.WriteLine("Appointment cancelled.");
+}
+else
+{
+    Console.WriteLine("Appointment could not be cancelled.");
+}
+
+Console.WriteLine();
+Console.WriteLine("=== Complete Appointment ===");
+
+bool appointmentCompleted = appointmentManager.Complete(5);
+
+if (appointmentCompleted)
+{
+    Console.WriteLine("Appointment completed.");
+}
+else
+{
+    Console.WriteLine("Appointment could not be completed.");
+}
+
+Console.WriteLine();
+Console.WriteLine("=== Cancel Test ===");
+
+bool cancelTestCreated = appointmentManager.Book(
+    patient4.Id,
+    doctor1.Id,
+    DateTime.Now.AddDays(3).Date.AddHours(12),
+    30
+);
+
+if (cancelTestCreated)
+{
+    Appointment[] cancelTestAppointments = appointmentManager.GetByPatient(patient4.Id);
+
+    if (cancelTestAppointments.Length > 0)
+    {
+        Appointment cancelTestAppointment = cancelTestAppointments[0];
+
+        bool cancelTest = appointmentManager.Cancel(
+            cancelTestAppointment.Id,
+            "Patient requested cancellation."
+        );
+
+        if (cancelTest)
+        {
+            Console.WriteLine("Cancel test passed.");
+        }
+        else
+        {
+            Console.WriteLine("Cancel test failed.");
+        }
+
+        appointmentManager.DisplayAppointment(cancelTestAppointment);
+    }
+}
