@@ -176,3 +176,64 @@ else
 }
 
 doctorManager.DisplayAll();
+
+Console.WriteLine();
+Console.WriteLine("=== Appointments ===");
+
+Appointment appointment1 = new Appointment(
+    patient1.Id,
+    doctor1.Id,
+    DateTime.Now.AddDays(1).Date.AddHours(10),
+    30
+);
+
+Appointment appointment2 = new Appointment(
+    patient2.Id,
+    doctor2.Id,
+    DateTime.Now.AddDays(1).Date.AddHours(11),
+    45
+);
+
+Appointment appointment3 = new Appointment(
+    patient3.Id,
+    doctor3.Id,
+    DateTime.Now.AddDays(2).Date.AddHours(9),
+    20
+);
+
+Console.WriteLine(appointment1);
+Console.WriteLine(appointment2);
+Console.WriteLine(appointment3);
+
+Console.WriteLine();
+Console.WriteLine("=== Appointment Status ===");
+
+bool cancelled = appointment1.Cancel("Patient could not come.");
+
+if (cancelled)
+{
+    Console.WriteLine("Appointment 1 cancelled.");
+}
+
+bool completed = appointment2.Complete();
+
+if (completed)
+{
+    Console.WriteLine("Appointment 2 completed.");
+}
+
+bool secondCancel = appointment1.Cancel("Another reason.");
+
+if (secondCancel)
+{
+    Console.WriteLine("Appointment 1 cancelled again.");
+}
+else
+{
+    Console.WriteLine("Appointment 1 cannot be cancelled again.");
+}
+
+Console.WriteLine();
+Console.WriteLine(appointment1);
+Console.WriteLine(appointment2);
+Console.WriteLine(appointment3);
