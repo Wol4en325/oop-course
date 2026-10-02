@@ -1,4 +1,4 @@
-namespace ClinicApp;
+﻿namespace ClinicApp;
 
 public class Doctor
 {
@@ -7,11 +7,10 @@ public class Doctor
     public int Id { get; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string Speciality { get; set; }
+    public Speciality Speciality { get; set; }
     public string LicenseNumber { get; set; }
     public string Phone { get; set; }
-    public int WorkStartHour { get; set; }
-    public int WorkEndHour { get; set; }
+    public WorkSchedule Schedule { get; set; }
 
     public string FullName
     {
@@ -25,7 +24,7 @@ public class Doctor
     {
         get
         {
-            return WorkEndHour - WorkStartHour;
+            return Schedule.HoursPerDay;
         }
     }
 
@@ -33,7 +32,7 @@ public class Doctor
     {
         get
         {
-            return WorkStartHour.ToString("D2") + ":00-" + WorkEndHour.ToString("D2") + ":00";
+            return Schedule.Display;
         }
     }
 
@@ -41,11 +40,11 @@ public class Doctor
     {
         get
         {
-            return CanAcceptAt(DateTime.Now.Hour);
+            return Schedule.IsNow;
         }
     }
 
-    public Doctor(string firstName, string lastName, string speciality, string licenseNumber, string phone)
+    public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone)
     {
         Id = _nextId++;
         FirstName = firstName;
@@ -53,23 +52,22 @@ public class Doctor
         Speciality = speciality;
         LicenseNumber = licenseNumber;
         Phone = phone;
-        WorkStartHour = 8;
-        WorkEndHour = 17;
+        Schedule = new WorkSchedule(8, 17);
     }
 
     public Doctor()
-        : this("", "", "", "", "")
+        : this("", "", Speciality.General, "", "")
     {
     }
 
-    public Doctor(string firstName, string lastName, string speciality)
+    public Doctor(string firstName, string lastName, Speciality speciality)
         : this(firstName, lastName, speciality, "", "")
     {
     }
 
     public bool CanAcceptAt(int hour)
     {
-        return hour >= WorkStartHour && hour < WorkEndHour;
+        return Schedule.Contains(hour);
     }
 
     public override string ToString()
@@ -85,6 +83,6 @@ public class Doctor
             status = "outside working hours";
         }
 
-        return "[" + Id + "] " + FullName + " | " + Speciality + " | " + LicenseNumber + " | Phone: " + Phone + " | " + WorkSchedule + " (" + WorkingHoursPerDay + " hours) | " + status;
+        return "[" + Id + "] " + FullName + " | " + ClinicFormatter.FormatSpeciality(Speciality) + " | " + LicenseNumber + " | Phone: " + ClinicFormatter.FormatPhone(Phone) + " | " + Schedule + " | " + status;
     }
 }
