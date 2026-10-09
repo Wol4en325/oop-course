@@ -1,7 +1,12 @@
-﻿namespace ClinicApp.Utils;
+using System.Text.RegularExpressions;
+
+namespace ClinicApp.Utils;
 
 public static class ClinicValidator
 {
+    private static readonly Regex PhoneRegex = new(@"\A[0-9]{10}\z");
+    private static readonly Regex EmailRegex = new(@"\A[^@\s]+@[^@\s]+\.[^@\s]+\z");
+
     public static void ValidateName(string value, string fieldName)
     {
         if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
@@ -10,14 +15,17 @@ public static class ClinicValidator
 
     public static void ValidatePhone(string phone)
     {
-        if (string.IsNullOrWhiteSpace(phone) || phone.Length != 10)
+        if (phone == null || !PhoneRegex.IsMatch(phone))
             throw new ArgumentException("Phone must contain exactly 10 digits.", nameof(phone));
+    }
 
-        for (int i = 0; i < phone.Length; i++)
-        {
-            if (phone[i] < '0' || phone[i] > '9')
-                throw new ArgumentException("Phone must contain only digits.", nameof(phone));
-        }
+    public static void ValidateEmail(string email)
+    {
+        if (string.IsNullOrEmpty(email))
+            return;
+
+        if (!EmailRegex.IsMatch(email))
+            throw new ArgumentException("Invalid email address.", nameof(email));
     }
 
     public static void ValidateDate(DateTime value, string fieldName)
