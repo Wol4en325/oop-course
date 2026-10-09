@@ -18,8 +18,7 @@ public class Appointment
         get { return _durationMinutes; }
         set
         {
-            if (value <= 0)
-                throw new ArgumentOutOfRangeException(nameof(DurationMinutes), "Duration must be greater than zero.");
+            ClinicValidator.ValidatePositive(value, nameof(DurationMinutes));
 
             _durationMinutes = value;
         }

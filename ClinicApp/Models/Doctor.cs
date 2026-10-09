@@ -18,8 +18,7 @@ public class Doctor
         get { return _firstName; }
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
-                throw new ArgumentException("First name must contain 1 to 50 characters.", nameof(FirstName));
+            ClinicValidator.ValidateName(value, nameof(FirstName));
 
             _firstName = value;
         }
@@ -29,8 +28,7 @@ public class Doctor
         get { return _lastName; }
         set
         {
-            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
-                throw new ArgumentException("Last name must contain 1 to 50 characters.", nameof(LastName));
+            ClinicValidator.ValidateName(value, nameof(LastName));
 
             _lastName = value;
         }
@@ -52,14 +50,7 @@ public class Doctor
         get { return _phone; }
         set
         {
-            if (value == null || value.Length != 10)
-                throw new ArgumentException("Phone must contain exactly 10 digits.", nameof(Phone));
-
-            for (int i = 0; i < value.Length; i++)
-            {
-                if (value[i] < '0' || value[i] > '9')
-                    throw new ArgumentException("Phone must contain only digits.", nameof(Phone));
-            }
+            ClinicValidator.ValidatePhone(value);
 
             _phone = value;
         }
