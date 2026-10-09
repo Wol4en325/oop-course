@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Enums;
+using ClinicApp.Utils;
+using ClinicApp.Managers;
+namespace ClinicApp.Models;
 
 public struct WorkSchedule
 {
@@ -45,3 +48,5 @@ public struct WorkSchedule
         return Display + " (" + HoursPerDay + " год)";
     }
 }
+
+

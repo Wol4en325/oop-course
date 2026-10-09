@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Utils;
+using ClinicApp.Managers;
+using ClinicApp.Enums;
+namespace ClinicApp.Models;
 
 public class Doctor
 {
@@ -86,3 +89,6 @@ public class Doctor
         return "[" + Id + "] " + FullName + " | " + ClinicFormatter.FormatSpeciality(Speciality) + " | " + LicenseNumber + " | Phone: " + ClinicFormatter.FormatPhone(Phone) + " | " + Schedule + " | " + status;
     }
 }
+
+
+

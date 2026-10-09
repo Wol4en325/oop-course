@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Utils;
+using ClinicApp.Managers;
+using ClinicApp.Enums;
+namespace ClinicApp.Models;
 
 public class Patient
 {
@@ -85,3 +88,6 @@ public class Patient
         return "[" + Id + "] " + FullName + " | Age: " + ClinicFormatter.FormatAge(Age) + " (" + GetAgeCategory() + ") | Blood: " + ClinicFormatter.FormatBloodType(BloodType) + " | Phone: " + ClinicFormatter.FormatPhone(Phone);
     }
 }
+
+
+

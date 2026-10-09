@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Utils;
+using ClinicApp.Models;
+using ClinicApp.Enums;
+namespace ClinicApp.Managers;
 
 public class PatientManager
 {
@@ -102,3 +105,6 @@ public class PatientManager
         return result;
     }
 }
+
+
+

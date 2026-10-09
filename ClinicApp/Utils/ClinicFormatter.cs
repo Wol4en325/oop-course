@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Managers;
+using ClinicApp.Models;
+using ClinicApp.Enums;
+namespace ClinicApp.Utils;
 
 public static class ClinicFormatter
 {
@@ -73,3 +76,6 @@ public static class ClinicFormatter
         return "(" + phone.Substring(0, 3) + ") " + phone.Substring(3, 3) + "-" + phone.Substring(6, 4);
     }
 }
+
+
+

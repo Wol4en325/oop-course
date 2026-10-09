@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Utils;
+using ClinicApp.Managers;
+using ClinicApp.Models;
+namespace ClinicApp.Enums;
 
 public enum Speciality
 {
@@ -11,3 +14,6 @@ public enum Speciality
     Dermatology,
     Emergency
 }
+
+
+

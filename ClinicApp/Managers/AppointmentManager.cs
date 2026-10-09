@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Enums;
+using ClinicApp.Utils;
+using ClinicApp.Models;
+namespace ClinicApp.Managers;
 
 public class AppointmentManager
 {
@@ -66,3 +69,5 @@ public class AppointmentManager
         return GetByDate(new DateTime(year, month, day));
     }
 }
+
+

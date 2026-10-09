@@ -1,4 +1,7 @@
-﻿namespace ClinicApp;
+﻿using ClinicApp.Utils;
+using ClinicApp.Managers;
+using ClinicApp.Models;
+namespace ClinicApp.Enums;
 
 public enum BloodType
 {
@@ -12,3 +15,6 @@ public enum BloodType
     OPositive,
     ONegative
 }
+
+
+
