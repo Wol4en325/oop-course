@@ -16,7 +16,13 @@ public class Appointment
     public int DurationMinutes
     {
         get { return _durationMinutes; }
-        set { _durationMinutes = value; }
+        set
+        {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(DurationMinutes), "Duration must be greater than zero.");
+
+            _durationMinutes = value;
+        }
     }
     public AppointmentStatus Status { get; private set; }
     public string Notes { get; private set; }
@@ -39,13 +45,13 @@ public class Appointment
 
     public Appointment(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
     {
-        Id = _nextId++;
         PatientId = patientId;
         DoctorId = doctorId;
         ScheduledAt = scheduledAt;
         DurationMinutes = durationMinutes;
         Status = AppointmentStatus.Scheduled;
         Notes = "";
+        Id = _nextId++;
     }
 
     public bool Cancel(string reason = "")

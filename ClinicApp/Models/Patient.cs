@@ -16,23 +16,56 @@ public class Patient
     public string FirstName
     {
         get { return _firstName; }
-        set { _firstName = value; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
+                throw new ArgumentException("First name must contain 1 to 50 characters.", nameof(FirstName));
+
+            _firstName = value;
+        }
     }
     public string LastName
     {
         get { return _lastName; }
-        set { _lastName = value; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
+                throw new ArgumentException("Last name must contain 1 to 50 characters.", nameof(LastName));
+
+            _lastName = value;
+        }
     }
     public DateTime DateOfBirth
     {
         get { return _dateOfBirth; }
-        set { _dateOfBirth = value; }
+        set
+        {
+            if (value.Date > DateTime.Today)
+                throw new ArgumentOutOfRangeException(nameof(DateOfBirth), "Date of birth cannot be in the future.");
+
+            if (value.Year < 1900)
+                throw new ArgumentOutOfRangeException(nameof(DateOfBirth), "Date of birth cannot be earlier than 1900.");
+
+            _dateOfBirth = value;
+        }
     }
     public BloodType BloodType { get; set; }
     public string Phone
     {
         get { return _phone; }
-        set { _phone = value; }
+        set
+        {
+            if (value == null || value.Length != 10)
+                throw new ArgumentException("Phone must contain exactly 10 digits.", nameof(Phone));
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (value[i] < '0' || value[i] > '9')
+                    throw new ArgumentException("Phone must contain only digits.", nameof(Phone));
+            }
+
+            _phone = value;
+        }
     }
     public string Email { get; set; }
 
@@ -70,13 +103,13 @@ public class Patient
 
     public Patient(string firstName, string lastName, DateTime dateOfBirth, BloodType bloodType, string phone)
     {
-        Id = _nextId++;
         FirstName = firstName;
         LastName = lastName;
         DateOfBirth = dateOfBirth;
         BloodType = bloodType;
         Phone = phone;
         Email = "";
+        Id = _nextId++;
     }
 
     public Patient()

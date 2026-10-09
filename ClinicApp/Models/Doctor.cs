@@ -16,23 +16,53 @@ public class Doctor
     public string FirstName
     {
         get { return _firstName; }
-        set { _firstName = value; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
+                throw new ArgumentException("First name must contain 1 to 50 characters.", nameof(FirstName));
+
+            _firstName = value;
+        }
     }
     public string LastName
     {
         get { return _lastName; }
-        set { _lastName = value; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.Length > 50)
+                throw new ArgumentException("Last name must contain 1 to 50 characters.", nameof(LastName));
+
+            _lastName = value;
+        }
     }
     public Speciality Speciality { get; set; }
     public string LicenseNumber
     {
         get { return _licenseNumber; }
-        set { _licenseNumber = value; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("License number cannot be empty.", nameof(LicenseNumber));
+
+            _licenseNumber = value;
+        }
     }
     public string Phone
     {
         get { return _phone; }
-        set { _phone = value; }
+        set
+        {
+            if (value == null || value.Length != 10)
+                throw new ArgumentException("Phone must contain exactly 10 digits.", nameof(Phone));
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (value[i] < '0' || value[i] > '9')
+                    throw new ArgumentException("Phone must contain only digits.", nameof(Phone));
+            }
+
+            _phone = value;
+        }
     }
     public WorkSchedule Schedule { get; set; }
 
@@ -70,13 +100,13 @@ public class Doctor
 
     public Doctor(string firstName, string lastName, Speciality speciality, string licenseNumber, string phone)
     {
-        Id = _nextId++;
         FirstName = firstName;
         LastName = lastName;
         Speciality = speciality;
         LicenseNumber = licenseNumber;
         Phone = phone;
         Schedule = new WorkSchedule(8, 17);
+        Id = _nextId++;
     }
 
     public Doctor()
