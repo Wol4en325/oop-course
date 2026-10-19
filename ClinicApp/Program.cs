@@ -12,16 +12,16 @@ while (running)
     Console.WriteLine("1. Add patient");
     Console.WriteLine("2. Add doctor");
     Console.WriteLine("3. Make appointment");
-    Console.WriteLine("4. Show patients");
-    Console.WriteLine("5. Show doctors");
-    Console.WriteLine("6. Show appointments");
-    Console.WriteLine("7. Add diagnosis");
-    Console.WriteLine("8. Add lab result");
-    Console.WriteLine("9. Add prescription");
-    Console.WriteLine("10. Show all medical records");
-    Console.WriteLine("11. Show medical records by type");
-    Console.WriteLine("12. Show medical records statistics");
-    Console.WriteLine("13. Show patient medical card");
+    Console.WriteLine("4. Show patient medical card");
+    Console.WriteLine("5. Show medical records report");
+    Console.WriteLine("6. Show patients");
+    Console.WriteLine("7. Show doctors");
+    Console.WriteLine("8. Show appointments");
+    Console.WriteLine("9. Add diagnosis");
+    Console.WriteLine("10. Add lab result");
+    Console.WriteLine("11. Add prescription");
+    Console.WriteLine("12. Show all medical records");
+    Console.WriteLine("13. Show medical records by type");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -117,22 +117,22 @@ while (running)
                 break;
             }
 
-            case "4":
+            case "6":
                 for (int i = 0; i < clinic.Patients.Count; i++)
                     Console.WriteLine(clinic.Patients[i]);
                 break;
 
-            case "5":
+            case "7":
                 for (int i = 0; i < clinic.Doctors.Count; i++)
                     Console.WriteLine(clinic.Doctors[i]);
                 break;
 
-            case "6":
+            case "8":
                 for (int i = 0; i < clinic.Appointments.Count; i++)
                     Console.WriteLine(clinic.Appointments[i]);
                 break;
 
-            case "7":
+            case "9":
             {
                 Console.Write("Patient ID: ");
                 int patientId = int.Parse(Console.ReadLine() ?? "");
@@ -166,7 +166,7 @@ while (running)
                 break;
             }
 
-            case "8":
+            case "10":
             {
                 Console.Write("Patient ID: ");
                 int patientId = int.Parse(Console.ReadLine() ?? "");
@@ -186,6 +186,8 @@ while (running)
 
                 Console.Write("Test name: ");
                 string testName = Console.ReadLine() ?? "";
+                Console.Write("Unit (optional): ");
+                string unit = Console.ReadLine() ?? "";
                 Console.Write("Numeric result: ");
                 if (!double.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double value))
                 {
@@ -199,14 +201,14 @@ while (running)
                 Console.Write("Is the result normal? (y/n): ");
                 bool isNormal = (Console.ReadLine() ?? "").Trim().ToLowerInvariant() == "y";
 
-                LabResult labResult = new LabResult(patientId, doctorId, date, testName, value, "", referenceRange, isNormal);
+                LabResult labResult = new LabResult(patientId, doctorId, date, testName, value, unit, referenceRange, isNormal);
                 clinic.MedicalRecords.AddRecord(labResult);
 
                 Console.WriteLine("Lab result added. ID: " + labResult.Id);
                 break;
             }
 
-            case "9":
+            case "11":
             {
                 Console.Write("Patient ID: ");
                 int patientId = int.Parse(Console.ReadLine() ?? "");
@@ -248,11 +250,11 @@ while (running)
                 break;
             }
 
-            case "10":
+            case "12":
                 clinic.MedicalRecords.DisplayAllRecords();
                 break;
 
-            case "11":
+            case "13":
             {
                 Console.WriteLine("Types: Діагноз, Аналіз, Рецепт");
                 Console.Write("Enter record type: ");
@@ -262,7 +264,7 @@ while (running)
                 break;
             }
 
-            case "12":
+            case "5":
                 Console.WriteLine("Total medical records: " + clinic.MedicalRecords.Count);
                 Console.WriteLine("Active medical records: " + clinic.MedicalRecords.CountActiveRecords());
                 Console.WriteLine("Diagnoses: " + clinic.MedicalRecords.CountRecordsByType("Діагноз"));
@@ -270,7 +272,7 @@ while (running)
                 Console.WriteLine("Prescriptions: " + clinic.MedicalRecords.CountRecordsByType("Рецепт"));
                 break;
 
-            case "13":
+            case "4":
             {
                 Console.Write("Patient ID: ");
                 if (!int.TryParse(Console.ReadLine(), out int patientId))
@@ -307,7 +309,7 @@ while (running)
     }
     catch (FormatException)
     {
-        Console.WriteLine("Error: РЅРµРїСЂР°РІРёР»СЊРЅРёР№ С„РѕСЂРјР°С‚ РІРІРµРґРµРЅРёС… РґР°РЅРёС….");
+        Console.WriteLine("Error: Invalid input format.");
     }
     catch (Exception e)
     {
