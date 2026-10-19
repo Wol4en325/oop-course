@@ -1,15 +1,29 @@
-namespace ClinicApp;
+using ClinicApp.Utils;
+using ClinicApp.Managers;
+using ClinicApp.Enums;
+namespace ClinicApp.Models;
 
 public class Appointment
 {
     private static int _nextId = 1;
 
+    private int _durationMinutes;
+
     public int Id { get; }
     public int PatientId { get; }
     public int DoctorId { get; }
     public DateTime ScheduledAt { get; set; }
-    public int DurationMinutes { get; set; }
-    public string Status { get; private set; }
+    public int DurationMinutes
+    {
+        get { return _durationMinutes; }
+        set
+        {
+            ClinicValidator.ValidatePositive(value, nameof(DurationMinutes));
+
+            _durationMinutes = value;
+        }
+    }
+    public AppointmentStatus Status { get; private set; }
     public string Notes { get; private set; }
 
     public DateTime EndsAt
@@ -24,29 +38,29 @@ public class Appointment
     {
         get
         {
-            return ScheduledAt > DateTime.Now && Status == "Scheduled";
+            return ScheduledAt > DateTime.Now && Status == AppointmentStatus.Scheduled;
         }
     }
 
     public Appointment(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
     {
-        Id = _nextId++;
         PatientId = patientId;
         DoctorId = doctorId;
         ScheduledAt = scheduledAt;
         DurationMinutes = durationMinutes;
-        Status = "Scheduled";
+        Status = AppointmentStatus.Scheduled;
         Notes = "";
+        Id = _nextId++;
     }
 
     public bool Cancel(string reason = "")
     {
-        if (Status != "Scheduled")
+        if (Status != AppointmentStatus.Scheduled)
         {
             return false;
         }
 
-        Status = "Cancelled";
+        Status = AppointmentStatus.Cancelled;
 
         if (reason.Length > 0)
         {
@@ -58,12 +72,12 @@ public class Appointment
 
     public bool Complete()
     {
-        if (Status != "Scheduled")
+        if (Status != AppointmentStatus.Scheduled)
         {
             return false;
         }
 
-        Status = "Completed";
+        Status = AppointmentStatus.Completed;
         return true;
     }
 
