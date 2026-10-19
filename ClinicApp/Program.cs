@@ -1,4 +1,4 @@
-﻿using ClinicApp;
+using ClinicApp;
 using ClinicApp.Enums;
 using ClinicApp.Models;
 
@@ -15,6 +15,12 @@ while (running)
     Console.WriteLine("4. Show patients");
     Console.WriteLine("5. Show doctors");
     Console.WriteLine("6. Show appointments");
+    Console.WriteLine("7. Add diagnosis");
+    Console.WriteLine("8. Add lab result");
+    Console.WriteLine("9. Add prescription");
+    Console.WriteLine("10. Show all medical records");
+    Console.WriteLine("11. Show medical records by type");
+    Console.WriteLine("12. Show medical records statistics");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -125,6 +131,135 @@ while (running)
                     Console.WriteLine(clinic.Appointments[i]);
                 break;
 
+            case "7":
+            {
+                Console.Write("Patient ID: ");
+                int patientId = int.Parse(Console.ReadLine() ?? "");
+
+                Console.Write("Doctor ID: ");
+                int doctorId = int.Parse(Console.ReadLine() ?? "");
+
+                if (clinic.Patients.FindById(patientId) == null ||
+                    clinic.Doctors.FindById(doctorId) == null)
+                {
+                    Console.WriteLine("Patient or doctor was not found.");
+                    break;
+                }
+
+                Console.Write("Date (yyyy-MM-dd): ");
+                DateTime date = DateTime.Parse(Console.ReadLine() ?? "");
+
+                Console.Write("Diagnosis code: ");
+                string code = Console.ReadLine() ?? "";
+
+                Console.Write("Description: ");
+                string description = Console.ReadLine() ?? "";
+
+                Console.Write("Is chronic? (y/n): ");
+                bool isChronic = (Console.ReadLine() ?? "").Trim().Equals("y", StringComparison.OrdinalIgnoreCase);
+
+                Diagnosis diagnosis = new Diagnosis(patientId, doctorId, date, code, description, isChronic);
+                clinic.MedicalRecords.AddRecord(diagnosis);
+
+                Console.WriteLine("Diagnosis added. ID: " + diagnosis.Id);
+                break;
+            }
+
+            case "8":
+            {
+                Console.Write("Patient ID: ");
+                int patientId = int.Parse(Console.ReadLine() ?? "");
+
+                Console.Write("Doctor ID: ");
+                int doctorId = int.Parse(Console.ReadLine() ?? "");
+
+                if (clinic.Patients.FindById(patientId) == null ||
+                    clinic.Doctors.FindById(doctorId) == null)
+                {
+                    Console.WriteLine("Patient or doctor was not found.");
+                    break;
+                }
+
+                Console.Write("Date (yyyy-MM-dd): ");
+                DateTime date = DateTime.Parse(Console.ReadLine() ?? "");
+
+                Console.Write("Test name: ");
+                string testName = Console.ReadLine() ?? "";
+
+                Console.Write("Result: ");
+                string result = Console.ReadLine() ?? "";
+
+                Console.Write("Unit (optional): ");
+                string unit = Console.ReadLine() ?? "";
+
+                LabResult labResult = new LabResult(patientId, doctorId, date, testName, result, unit);
+                clinic.MedicalRecords.AddRecord(labResult);
+
+                Console.WriteLine("Lab result added. ID: " + labResult.Id);
+                break;
+            }
+
+            case "9":
+            {
+                Console.Write("Patient ID: ");
+                int patientId = int.Parse(Console.ReadLine() ?? "");
+
+                Console.Write("Doctor ID: ");
+                int doctorId = int.Parse(Console.ReadLine() ?? "");
+
+                if (clinic.Patients.FindById(patientId) == null ||
+                    clinic.Doctors.FindById(doctorId) == null)
+                {
+                    Console.WriteLine("Patient or doctor was not found.");
+                    break;
+                }
+
+                Console.Write("Date (yyyy-MM-dd): ");
+                DateTime date = DateTime.Parse(Console.ReadLine() ?? "");
+
+                Console.Write("Medication name: ");
+                string medication = Console.ReadLine() ?? "";
+
+                Console.Write("Instructions: ");
+                string instructions = Console.ReadLine() ?? "";
+
+                Console.Write("End date (yyyy-MM-dd, empty if none): ");
+                string endDateText = Console.ReadLine() ?? "";
+                DateTime? endDate = string.IsNullOrWhiteSpace(endDateText)
+                    ? null
+                    : DateTime.Parse(endDateText);
+
+                Prescription prescription = new Prescription(
+                    patientId, doctorId, date, medication, instructions, endDate);
+
+                clinic.MedicalRecords.AddRecord(prescription);
+
+                Console.WriteLine("Prescription added. ID: " + prescription.Id);
+                break;
+            }
+
+            case "10":
+                clinic.MedicalRecords.DisplayAllRecords();
+                break;
+
+            case "11":
+            {
+                Console.WriteLine("Types: Diagnosis, Lab Result, Prescription");
+                Console.Write("Enter record type: ");
+                string recordType = Console.ReadLine() ?? "";
+
+                clinic.MedicalRecords.DisplayRecordsByType(recordType);
+                break;
+            }
+
+            case "12":
+                Console.WriteLine("Total medical records: " + clinic.MedicalRecords.Count);
+                Console.WriteLine("Active medical records: " + clinic.MedicalRecords.CountActiveRecords());
+                Console.WriteLine("Diagnoses: " + clinic.MedicalRecords.CountRecordsByType("Diagnosis"));
+                Console.WriteLine("Lab results: " + clinic.MedicalRecords.CountRecordsByType("Lab Result"));
+                Console.WriteLine("Prescriptions: " + clinic.MedicalRecords.CountRecordsByType("Prescription"));
+                break;
+
             case "0":
                 running = false;
                 break;
@@ -136,18 +271,18 @@ while (running)
     }
     catch (ArgumentOutOfRangeException e)
     {
-        Console.WriteLine("Помилка: " + e.Message);
+        Console.WriteLine("Error: " + e.Message);
     }
     catch (ArgumentException e)
     {
-        Console.WriteLine("Помилка: " + e.Message);
+        Console.WriteLine("Error: " + e.Message);
     }
     catch (FormatException)
     {
-        Console.WriteLine("Помилка: неправильний формат введених даних.");
+        Console.WriteLine("Error: неправильний формат введених даних.");
     }
     catch (Exception e)
     {
-        Console.WriteLine("Помилка: " + e.Message);
+        Console.WriteLine("Error: " + e.Message);
     }
 }

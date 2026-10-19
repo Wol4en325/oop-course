@@ -1,4 +1,3 @@
-﻿
 using ClinicApp.Managers;
 
 namespace ClinicApp;
@@ -11,6 +10,7 @@ public class Clinic
     public PatientManager Patients { get; } = new PatientManager();
     public DoctorManager Doctors { get; } = new DoctorManager();
     public AppointmentManager Appointments { get; } = new AppointmentManager();
+    public MedicalRecordManager MedicalRecords { get; } = new MedicalRecordManager();
 
     public Clinic(string name, string address)
     {

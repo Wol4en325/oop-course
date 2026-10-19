@@ -1,4 +1,4 @@
-﻿using ClinicApp.Utils;
+using ClinicApp.Utils;
 
 namespace ClinicApp.Models;
 
@@ -28,7 +28,7 @@ public abstract class MedicalRecord
 
     public virtual string GetRecordType()
     {
-        return "Медичний запис";
+        return "Medical Record";
     }
 
     public virtual bool IsActive()
