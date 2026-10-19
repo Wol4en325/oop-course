@@ -1,11 +1,13 @@
-using ClinicApp.Utils;
+﻿using ClinicApp.Utils;
 
 namespace ClinicApp.Models;
 
 public class LabResult : MedicalRecord
 {
     private string _testName = "";
-    private string _result = "";
+    private double _value;
+    private string _unit = "";
+    private string _referenceRange = "";
 
     public string TestName
     {
@@ -17,39 +19,68 @@ public class LabResult : MedicalRecord
         }
     }
 
-    public string Result
+    public double Value
     {
-        get { return _result; }
+        get { return _value; }
         set
         {
-            ClinicValidator.ValidateName(value, nameof(Result));
-            _result = value;
+            if (double.IsNaN(value) || double.IsInfinity(value))
+            {
+                throw new ArgumentOutOfRangeException(nameof(Value));
+            }
+
+            _value = value;
         }
     }
 
-    public string Unit { get; set; }
+    public string Unit
+    {
+        get { return _unit; }
+        set { _unit = value ?? ""; }
+    }
+
+    public string ReferenceRange
+    {
+        get { return _referenceRange; }
+        set
+        {
+            ClinicValidator.ValidateName(value, nameof(ReferenceRange));
+            _referenceRange = value;
+        }
+    }
+
+    public bool IsNormal { get; set; }
 
     public LabResult(
         int patientId,
         int doctorId,
         DateTime date,
         string testName,
-        string result,
-        string unit = "")
+        double value,
+        string unit,
+        string referenceRange,
+        bool isNormal)
         : base(patientId, doctorId, date)
     {
         TestName = testName;
-        Result = result;
+        Value = value;
         Unit = unit;
+        ReferenceRange = referenceRange;
+        IsNormal = isNormal;
     }
 
     public override string GetSummary()
     {
-        string summary = TestName + ": " + Result;
+        string summary = TestName + ": " + Value + " " + Unit;
+        summary += " (норма: " + ReferenceRange + ")";
 
-        if (Unit.Length > 0)
+        if (IsNormal)
         {
-            summary += " " + Unit;
+            summary += " [у нормі]";
+        }
+        else
+        {
+            summary += " [поза нормою]";
         }
 
         return summary;
@@ -57,6 +88,6 @@ public class LabResult : MedicalRecord
 
     public override string GetRecordType()
     {
-        return "Lab Result";
+        return "Аналіз";
     }
 }

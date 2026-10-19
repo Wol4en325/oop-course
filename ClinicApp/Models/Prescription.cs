@@ -1,11 +1,12 @@
-using ClinicApp.Utils;
+﻿using ClinicApp.Utils;
 
 namespace ClinicApp.Models;
 
 public class Prescription : MedicalRecord
 {
     private string _medicationName = "";
-    private string _instructions = "";
+    private string _dosage = "";
+    private int _durationDays;
 
     public string MedicationName
     {
@@ -17,39 +18,62 @@ public class Prescription : MedicalRecord
         }
     }
 
-    public string Instructions
+    public string Dosage
     {
-        get { return _instructions; }
+        get { return _dosage; }
         set
         {
-            ClinicValidator.ValidateName(value, nameof(Instructions));
-            _instructions = value;
+            ClinicValidator.ValidateName(value, nameof(Dosage));
+            _dosage = value;
         }
     }
 
-    public DateTime? EndDate { get; set; }
+    public int DurationDays
+    {
+        get { return _durationDays; }
+        set
+        {
+            if (value <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(DurationDays));
+            }
+
+            _durationDays = value;
+        }
+    }
+
+    public string Instructions { get; set; } = "";
+
+    public DateTime ExpiresAt
+    {
+        get { return Date.AddDays(DurationDays); }
+    }
 
     public Prescription(
         int patientId,
         int doctorId,
         DateTime date,
         string medicationName,
-        string instructions,
-        DateTime? endDate = null)
+        string dosage,
+        int durationDays,
+        string instructions = "")
         : base(patientId, doctorId, date)
     {
         MedicationName = medicationName;
+        Dosage = dosage;
+        DurationDays = durationDays;
         Instructions = instructions;
-        EndDate = endDate;
     }
 
     public override string GetSummary()
     {
-        string summary = MedicationName + ": " + Instructions;
+        string summary = MedicationName + ", дозування: " + Dosage;
+        summary += ", тривалість: " + DurationDays + " дн.";
+        summary += ", до: " + ExpiresAt.ToString("dd.MM.yyyy");
 
-        if (EndDate.HasValue)
+        if (!string.IsNullOrWhiteSpace(Instructions))
         {
-            summary += " (до " + EndDate.Value.ToString("dd.MM.yyyy") + ")";
+            summary += ", інструкції: " + Instructions;
         }
 
         return summary;
@@ -57,11 +81,11 @@ public class Prescription : MedicalRecord
 
     public override string GetRecordType()
     {
-        return "Prescription";
+        return "Рецепт";
     }
 
     public override bool IsActive()
     {
-        return !EndDate.HasValue || EndDate.Value.Date >= DateTime.Today;
+        return DateTime.Today <= ExpiresAt.Date;
     }
 }

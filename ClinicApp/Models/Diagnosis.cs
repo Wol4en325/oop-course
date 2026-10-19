@@ -1,4 +1,4 @@
-using ClinicApp.Utils;
+﻿using ClinicApp.Utils;
 
 namespace ClinicApp.Models;
 
@@ -57,6 +57,6 @@ public class Diagnosis : MedicalRecord
 
     public override string GetRecordType()
     {
-        return "Diagnosis";
+        return "Діагноз";
     }
 }

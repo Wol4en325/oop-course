@@ -21,6 +21,7 @@ while (running)
     Console.WriteLine("10. Show all medical records");
     Console.WriteLine("11. Show medical records by type");
     Console.WriteLine("12. Show medical records statistics");
+    Console.WriteLine("13. Show patient medical card");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -185,14 +186,20 @@ while (running)
 
                 Console.Write("Test name: ");
                 string testName = Console.ReadLine() ?? "";
+                Console.Write("Numeric result: ");
+                if (!double.TryParse(Console.ReadLine(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double value))
+                {
+                    Console.WriteLine("Invalid numeric value.");
+                    break;
+                }
 
-                Console.Write("Result: ");
-                string result = Console.ReadLine() ?? "";
+                Console.Write("Reference range: ");
+                string referenceRange = Console.ReadLine() ?? "";
 
-                Console.Write("Unit (optional): ");
-                string unit = Console.ReadLine() ?? "";
+                Console.Write("Is the result normal? (y/n): ");
+                bool isNormal = (Console.ReadLine() ?? "").Trim().ToLowerInvariant() == "y";
 
-                LabResult labResult = new LabResult(patientId, doctorId, date, testName, result, unit);
+                LabResult labResult = new LabResult(patientId, doctorId, date, testName, value, "", referenceRange, isNormal);
                 clinic.MedicalRecords.AddRecord(labResult);
 
                 Console.WriteLine("Lab result added. ID: " + labResult.Id);
@@ -214,23 +221,26 @@ while (running)
                     break;
                 }
 
-                Console.Write("Date (yyyy-MM-dd): ");
-                DateTime date = DateTime.Parse(Console.ReadLine() ?? "");
+                DateTime date = DateTime.Today;
 
                 Console.Write("Medication name: ");
                 string medication = Console.ReadLine() ?? "";
 
-                Console.Write("Instructions: ");
+                Console.Write("Dosage: ");
+                string dosage = Console.ReadLine() ?? "";
+
+                Console.Write("Duration in days: ");
+                if (!int.TryParse(Console.ReadLine(), out int durationDays) || durationDays <= 0)
+                {
+                    Console.WriteLine("Invalid duration.");
+                    break;
+                }
+
+                Console.Write("Instructions (optional): ");
                 string instructions = Console.ReadLine() ?? "";
 
-                Console.Write("End date (yyyy-MM-dd, empty if none): ");
-                string endDateText = Console.ReadLine() ?? "";
-                DateTime? endDate = string.IsNullOrWhiteSpace(endDateText)
-                    ? null
-                    : DateTime.Parse(endDateText);
-
                 Prescription prescription = new Prescription(
-                    patientId, doctorId, date, medication, instructions, endDate);
+                    patientId, doctorId, date, medication, dosage, durationDays, instructions);
 
                 clinic.MedicalRecords.AddRecord(prescription);
 
@@ -244,7 +254,7 @@ while (running)
 
             case "11":
             {
-                Console.WriteLine("Types: Diagnosis, Lab Result, Prescription");
+                Console.WriteLine("Types: Діагноз, Аналіз, Рецепт");
                 Console.Write("Enter record type: ");
                 string recordType = Console.ReadLine() ?? "";
 
@@ -255,11 +265,29 @@ while (running)
             case "12":
                 Console.WriteLine("Total medical records: " + clinic.MedicalRecords.Count);
                 Console.WriteLine("Active medical records: " + clinic.MedicalRecords.CountActiveRecords());
-                Console.WriteLine("Diagnoses: " + clinic.MedicalRecords.CountRecordsByType("Diagnosis"));
-                Console.WriteLine("Lab results: " + clinic.MedicalRecords.CountRecordsByType("Lab Result"));
-                Console.WriteLine("Prescriptions: " + clinic.MedicalRecords.CountRecordsByType("Prescription"));
+                Console.WriteLine("Diagnoses: " + clinic.MedicalRecords.CountRecordsByType("Діагноз"));
+                Console.WriteLine("Lab results: " + clinic.MedicalRecords.CountRecordsByType("Аналіз"));
+                Console.WriteLine("Prescriptions: " + clinic.MedicalRecords.CountRecordsByType("Рецепт"));
                 break;
 
+            case "13":
+            {
+                Console.Write("Patient ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int patientId))
+                {
+                    Console.WriteLine("Invalid patient ID.");
+                    break;
+                }
+
+                if (clinic.Patients.FindById(patientId) == null)
+                {
+                    Console.WriteLine("Patient was not found.");
+                    break;
+                }
+
+                clinic.MedicalRecords.DisplayPatientSummary(patientId);
+                break;
+            }
             case "0":
                 running = false;
                 break;
@@ -279,7 +307,7 @@ while (running)
     }
     catch (FormatException)
     {
-        Console.WriteLine("Error: неправильний формат введених даних.");
+        Console.WriteLine("Error: РЅРµРїСЂР°РІРёР»СЊРЅРёР№ С„РѕСЂРјР°С‚ РІРІРµРґРµРЅРёС… РґР°РЅРёС….");
     }
     catch (Exception e)
     {
