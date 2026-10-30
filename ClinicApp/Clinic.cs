@@ -1,4 +1,4 @@
-using ClinicApp.Managers;
+﻿using ClinicApp.Managers;
 
 namespace ClinicApp;
 
@@ -11,14 +11,17 @@ public class Clinic
     public DoctorManager Doctors { get; } = new DoctorManager();
     public AppointmentManager Appointments { get; } = new AppointmentManager();
     public MedicalRecordManager MedicalRecords { get; } = new MedicalRecordManager();
+    public BillingManager Billing { get; }
 
     public Clinic(string name, string address)
     {
         Name = name;
         Address = address;
+        Billing = new BillingManager(Appointments);
     }
 
     public Clinic() : this("Default Clinic", "Unknown")
     {
     }
 }
+

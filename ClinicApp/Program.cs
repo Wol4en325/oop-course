@@ -1,6 +1,9 @@
+﻿using System.Globalization;
 using ClinicApp;
 using ClinicApp.Enums;
 using ClinicApp.Models;
+using ClinicApp.Interfaces;
+using ClinicApp.Managers;
 
 Clinic clinic = new Clinic("City Health Clinic", "Main St. 12");
 
@@ -8,19 +11,15 @@ bool running = true;
 
 while (running)
 {
-    Console.WriteLine("\n=== Clinic Menu ===");
-    Console.WriteLine("1. Add patient");
-    Console.WriteLine("2. Add doctor");
-    Console.WriteLine("3. Make appointment");
-    Console.WriteLine("4. Show patients");
-    Console.WriteLine("5. Show doctors");
-    Console.WriteLine("6. Show appointments");
-    Console.WriteLine("7. Add diagnosis");
-    Console.WriteLine("8. Add lab result");
-    Console.WriteLine("9. Add prescription");
-    Console.WriteLine("10. Show all medical records");
-    Console.WriteLine("11. Show medical records by type");
-    Console.WriteLine("12. Show medical records statistics");
+    Console.WriteLine("\n==============================================");
+    Console.WriteLine("              CITY HEALTH CLINIC");
+    Console.WriteLine("==============================================");
+    Console.WriteLine("1. Patients       - registration, search");
+    Console.WriteLine("2. Doctors        - staff, schedule");
+    Console.WriteLine("3. Appointments   - visits, cancellations");
+    Console.WriteLine("4. Medical records - diagnoses, prescriptions");
+    Console.WriteLine("5. Billing        - payments, debts");
+    Console.WriteLine("6. Report         - overall statistics");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -29,6 +28,64 @@ while (running)
     try
     {
         switch (choice)
+        {
+            case "1":
+                PatientsMenu(clinic);
+                break;
+            case "2":
+                DoctorsMenu(clinic);
+                break;
+            case "3":
+                AppointmentsMenu(clinic);
+                break;
+            case "4":
+                MedicalRecordsMenu(clinic);
+                break;
+            case "5":
+                BillingMenu(clinic);
+                break;
+            case "6":
+                ReportMenu(clinic);
+                break;
+            case "0":
+                running = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+    catch (ArgumentOutOfRangeException e)
+    {
+        Console.WriteLine("Error: " + e.Message);
+    }
+    catch (ArgumentException e)
+    {
+        Console.WriteLine("Error: " + e.Message);
+    }
+    catch (FormatException)
+    {
+        Console.WriteLine("Error: Invalid input format.");
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine("Error: " + e.Message);
+    }
+}
+
+void PatientsMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Patients ---");
+        Console.WriteLine("1. Add patient");
+        Console.WriteLine("2. Show patients");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
         {
             case "1":
             {
@@ -54,8 +111,36 @@ while (running)
                 Console.WriteLine("Patient added. ID: " + patient.Id);
                 break;
             }
-
             case "2":
+                for (int i = 0; i < clinic.Patients.Count; i++)
+                    Console.WriteLine(clinic.Patients[i]);
+                break;
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+}
+
+void DoctorsMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Doctors ---");
+        Console.WriteLine("1. Add doctor");
+        Console.WriteLine("2. Show doctors");
+        Console.WriteLine("5. Show available hours");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
             {
                 Console.Write("First name: ");
                 string firstName = Console.ReadLine() ?? "";
@@ -87,8 +172,86 @@ while (running)
                 Console.WriteLine("Doctor added. ID: " + doctor.Id);
                 break;
             }
+            case "2":
+                for (int i = 0; i < clinic.Doctors.Count; i++)
+                    Console.WriteLine(clinic.Doctors[i]);
+                break;
+            case "5":
+            {
+                Console.Write("Doctor ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int doctorId))
+                {
+                    Console.WriteLine("Invalid doctor ID.");
+                    break;
+                }
 
-            case "3":
+                Doctor? doctor = clinic.Doctors.FindById(doctorId);
+
+                if (doctor == null)
+                {
+                    Console.WriteLine("Doctor not found.");
+                    break;
+                }
+
+                Console.Write("Date (dd.MM.yyyy): ");
+                string dateText = Console.ReadLine() ?? "";
+
+                if (!DateTime.TryParseExact(dateText, "dd.MM.yyyy",
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
+                {
+                    Console.WriteLine("Invalid date. Use dd.MM.yyyy.");
+                    break;
+                }
+
+                Console.Write("Number of slots: ");
+                if (!int.TryParse(Console.ReadLine(), out int slotCount))
+                {
+                    Console.WriteLine("Invalid number of slots.");
+                    break;
+                }
+
+                try
+                {
+                    ISchedulable schedulable = doctor;
+                    DateTime[] slots = schedulable.GetAvailableSlots(date, slotCount);
+
+                    Console.WriteLine("Available hours:");
+                    foreach (DateTime slot in slots)
+                        Console.WriteLine(slot.ToString("HH:mm"));
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    Console.WriteLine("Error: " + e.Message);
+                }
+
+                break;
+            }
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+}
+
+void AppointmentsMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Appointments ---");
+        Console.WriteLine("1. Make appointment");
+        Console.WriteLine("2. Show appointments");
+        Console.WriteLine("8. Cancel all appointments for a patient");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
             {
                 Console.Write("Patient ID: ");
                 int patientId = int.Parse(Console.ReadLine() ?? "");
@@ -115,36 +278,60 @@ while (running)
                 Console.WriteLine("Appointment added. ID: " + appointment.Id);
                 break;
             }
-
-            case "4":
-                for (int i = 0; i < clinic.Patients.Count; i++)
-                    Console.WriteLine(clinic.Patients[i]);
-                break;
-
-            case "5":
-                for (int i = 0; i < clinic.Doctors.Count; i++)
-                    Console.WriteLine(clinic.Doctors[i]);
-                break;
-
-            case "6":
+            case "2":
                 for (int i = 0; i < clinic.Appointments.Count; i++)
                     Console.WriteLine(clinic.Appointments[i]);
                 break;
-
-            case "7":
+            case "8":
             {
                 Console.Write("Patient ID: ");
-                int patientId = int.Parse(Console.ReadLine() ?? "");
-
-                Console.Write("Doctor ID: ");
-                int doctorId = int.Parse(Console.ReadLine() ?? "");
-
-                if (clinic.Patients.FindById(patientId) == null ||
-                    clinic.Doctors.FindById(doctorId) == null)
+                if (!int.TryParse(Console.ReadLine(), out int patientId))
                 {
-                    Console.WriteLine("Patient or doctor was not found.");
+                    Console.WriteLine("Invalid patient ID.");
                     break;
                 }
+
+                Appointment[] appointments = clinic.Appointments.GetByPatient(patientId);
+
+                Console.Write("Cancellation reason (press Enter for none): ");
+                string reason = Console.ReadLine() ?? "";
+
+                int cancelled = AppointmentManager.CancelAll(appointments, reason);
+                Console.WriteLine("Cancelled appointments: " + cancelled);
+                break;
+            }
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+}
+
+void MedicalRecordsMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Medical Records ---");
+        Console.WriteLine("1. Add diagnosis");
+        Console.WriteLine("2. Add lab result");
+        Console.WriteLine("3. Add prescription");
+        Console.WriteLine("4. Show all medical records");
+        Console.WriteLine("5. Show medical records by type");
+        Console.WriteLine("6. Show medical records statistics");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+            {
+                if (!TryGetRecordPeople(clinic, out int patientId, out int doctorId))
+                    break;
 
                 Console.Write("Date (yyyy-MM-dd): ");
                 DateTime date = DateTime.Parse(Console.ReadLine() ?? "");
@@ -164,21 +351,10 @@ while (running)
                 Console.WriteLine("Diagnosis added. ID: " + diagnosis.Id);
                 break;
             }
-
-            case "8":
+            case "2":
             {
-                Console.Write("Patient ID: ");
-                int patientId = int.Parse(Console.ReadLine() ?? "");
-
-                Console.Write("Doctor ID: ");
-                int doctorId = int.Parse(Console.ReadLine() ?? "");
-
-                if (clinic.Patients.FindById(patientId) == null ||
-                    clinic.Doctors.FindById(doctorId) == null)
-                {
-                    Console.WriteLine("Patient or doctor was not found.");
+                if (!TryGetRecordPeople(clinic, out int patientId, out int doctorId))
                     break;
-                }
 
                 Console.Write("Date (yyyy-MM-dd): ");
                 DateTime date = DateTime.Parse(Console.ReadLine() ?? "");
@@ -198,21 +374,10 @@ while (running)
                 Console.WriteLine("Lab result added. ID: " + labResult.Id);
                 break;
             }
-
-            case "9":
+            case "3":
             {
-                Console.Write("Patient ID: ");
-                int patientId = int.Parse(Console.ReadLine() ?? "");
-
-                Console.Write("Doctor ID: ");
-                int doctorId = int.Parse(Console.ReadLine() ?? "");
-
-                if (clinic.Patients.FindById(patientId) == null ||
-                    clinic.Doctors.FindById(doctorId) == null)
-                {
-                    Console.WriteLine("Patient or doctor was not found.");
+                if (!TryGetRecordPeople(clinic, out int patientId, out int doctorId))
                     break;
-                }
 
                 Console.Write("Date (yyyy-MM-dd): ");
                 DateTime date = DateTime.Parse(Console.ReadLine() ?? "");
@@ -237,52 +402,137 @@ while (running)
                 Console.WriteLine("Prescription added. ID: " + prescription.Id);
                 break;
             }
-
-            case "10":
+            case "4":
                 clinic.MedicalRecords.DisplayAllRecords();
                 break;
-
-            case "11":
+            case "5":
             {
                 Console.WriteLine("Types: Diagnosis, Lab Result, Prescription");
                 Console.Write("Enter record type: ");
                 string recordType = Console.ReadLine() ?? "";
-
                 clinic.MedicalRecords.DisplayRecordsByType(recordType);
                 break;
             }
-
-            case "12":
-                Console.WriteLine("Total medical records: " + clinic.MedicalRecords.Count);
-                Console.WriteLine("Active medical records: " + clinic.MedicalRecords.CountActiveRecords());
-                Console.WriteLine("Diagnoses: " + clinic.MedicalRecords.CountRecordsByType("Diagnosis"));
-                Console.WriteLine("Lab results: " + clinic.MedicalRecords.CountRecordsByType("Lab Result"));
-                Console.WriteLine("Prescriptions: " + clinic.MedicalRecords.CountRecordsByType("Prescription"));
+            case "6":
+                ShowMedicalRecordStatistics(clinic);
                 break;
-
             case "0":
-                running = false;
+                menuRunning = false;
                 break;
-
             default:
                 Console.WriteLine("Unknown menu option.");
                 break;
         }
     }
-    catch (ArgumentOutOfRangeException e)
+}
+
+bool TryGetRecordPeople(Clinic clinic, out int patientId, out int doctorId)
+{
+    Console.Write("Patient ID: ");
+    if (!int.TryParse(Console.ReadLine(), out patientId))
     {
-        Console.WriteLine("Error: " + e.Message);
+        Console.WriteLine("Invalid patient ID.");
+        doctorId = 0;
+        return false;
     }
-    catch (ArgumentException e)
+
+    Console.Write("Doctor ID: ");
+    if (!int.TryParse(Console.ReadLine(), out doctorId))
     {
-        Console.WriteLine("Error: " + e.Message);
+        Console.WriteLine("Invalid doctor ID.");
+        return false;
     }
-    catch (FormatException)
+
+    if (clinic.Patients.FindById(patientId) == null ||
+        clinic.Doctors.FindById(doctorId) == null)
     {
-        Console.WriteLine("Error: неправильний формат введених даних.");
+        Console.WriteLine("Patient or doctor was not found.");
+        return false;
     }
-    catch (Exception e)
+
+    return true;
+}
+
+void ShowMedicalRecordStatistics(Clinic clinic)
+{
+    Console.WriteLine("Total medical records: " + clinic.MedicalRecords.Count);
+    Console.WriteLine("Active medical records: " + clinic.MedicalRecords.CountActiveRecords());
+    Console.WriteLine("Diagnoses: " + clinic.MedicalRecords.CountRecordsByType("Diagnosis"));
+    Console.WriteLine("Lab results: " + clinic.MedicalRecords.CountRecordsByType("Lab Result"));
+    Console.WriteLine("Prescriptions: " + clinic.MedicalRecords.CountRecordsByType("Prescription"));
+}
+
+void BillingMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
     {
-        Console.WriteLine("Error: " + e.Message);
+        Console.WriteLine("\n--- Billing ---");
+        Console.WriteLine("1. Patient debt");
+        Console.WriteLine("2. All unpaid appointments");
+        Console.WriteLine("3. Pay appointment");
+        Console.WriteLine("4. Total clinic debt");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+            {
+                Console.Write("Patient ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int patientId))
+                {
+                    Console.WriteLine("Invalid patient ID.");
+                    break;
+                }
+
+                IPayable[] unpaid = clinic.Billing.GetUnpaidByPatient(patientId);
+
+                Console.WriteLine("Unpaid appointments for patient #" + patientId + ":");
+                clinic.Billing.DisplayUnpaid(unpaid);
+                Console.WriteLine("Debt: " + clinic.Billing.GetPatientDebt(patientId).ToString("F2") + " UAH");
+                break;
+            }
+            case "2":
+                clinic.Billing.DisplayUnpaid(clinic.Billing.GetAllUnpaid());
+                break;
+            case "3":
+            {
+                Console.Write("Appointment ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int appointmentId))
+                {
+                    Console.WriteLine("Invalid appointment ID.");
+                    break;
+                }
+
+                if (clinic.Billing.PayAppointment(appointmentId))
+                    Console.WriteLine("Appointment paid.");
+                else
+                    Console.WriteLine("Payment failed: appointment not found, already paid or cancelled.");
+
+                break;
+            }
+            case "4":
+                Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
+                break;
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
     }
 }
+
+void ReportMenu(Clinic clinic)
+{
+    Console.WriteLine("\n--- Clinic Report ---");
+    Console.WriteLine("Patients: " + clinic.Patients.Count);
+    Console.WriteLine("Doctors: " + clinic.Doctors.Count);
+    Console.WriteLine("Appointments: " + clinic.Appointments.Count);
+    ShowMedicalRecordStatistics(clinic);
+    Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
+}
+
