@@ -70,6 +70,31 @@ public class AppointmentManager
         return GetByDate(new DateTime(year, month, day));
     }
 
+    public Appointment[] GetByPatient(int patientId)
+    {
+        int foundCount = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].PatientId == patientId)
+            {
+                foundCount++;
+            }
+        }
+
+        Appointment[] result = new Appointment[foundCount];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i].PatientId == patientId)
+            {
+                result[index++] = _appointments[i];
+            }
+        }
+
+        return result;
+    }
     public Appointment[] GetAll()
     {
         Appointment[] result = new Appointment[_count];
