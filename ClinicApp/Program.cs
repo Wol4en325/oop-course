@@ -246,6 +246,7 @@ void AppointmentsMenu(Clinic clinic)
         Console.WriteLine("1. Make appointment");
         Console.WriteLine("2. Show appointments");
         Console.WriteLine("8. Cancel all appointments for a patient");
+        Console.WriteLine("9. Filter appointments by type");
         Console.WriteLine("0. Back");
         Console.Write("Choose option: ");
 
@@ -309,14 +310,56 @@ void AppointmentsMenu(Clinic clinic)
                     Console.WriteLine("Priority through Appointment: " + baseAppointment.GetPriority());
                     Console.WriteLine("Priority through UrgentAppointment: " + urgentAppointment.GetPriority());
                 }
-
-                Console.WriteLine("Appointment added. ID: " + appointment.Id);
                 break;
             }
             case "2":
                 for (int i = 0; i < clinic.Appointments.Count; i++)
                     Console.WriteLine(clinic.Appointments[i]);
                 break;
+
+            case "9":
+            {
+                Console.WriteLine("1. Regular appointments");
+                Console.WriteLine("2. Urgent appointments");
+                Console.WriteLine("3. Specialist appointments");
+                Console.Write("Choose type: ");
+
+                string type = Console.ReadLine() ?? "";
+                Appointment[] filteredAppointments = Array.Empty<Appointment>();
+
+                switch (type)
+                {
+                    case "1":
+                        filteredAppointments = clinic.Appointments.GetRegular();
+                        break;
+                    case "2":
+                        filteredAppointments = clinic.Appointments.GetUrgent();
+                        break;
+                    case "3":
+                        filteredAppointments = clinic.Appointments.GetSpecialist();
+                        break;
+                    default:
+                        Console.WriteLine("Unknown appointment type.");
+                        break;
+                }
+
+                if (type == "1" || type == "2" || type == "3")
+                {
+                    if (filteredAppointments.Length == 0)
+                    {
+                        Console.WriteLine("No appointments found.");
+                    }
+                    else
+                    {
+                        foreach (Appointment item in filteredAppointments)
+                        {
+                            clinic.Appointments.DisplayAppointment(item);
+                        }
+                    }
+                }
+
+                break;
+            }
             case "8":
             {
                 Console.Write("Patient ID: ");
@@ -570,5 +613,3 @@ void ReportMenu(Clinic clinic)
     ShowMedicalRecordStatistics(clinic);
     Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
 }
-
-

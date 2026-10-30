@@ -115,6 +115,76 @@ public Appointment[] GetByDate(DateTime date)
 
         return result;
     }
+    public Appointment[] GetUrgent()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+                result[index++] = _appointments[i];
+        }
+
+        return result;
+    }
+
+    public Appointment[] GetSpecialist()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+                result[index++] = _appointments[i];
+        }
+
+        return result;
+    }
+
+    public Appointment[] GetRegular()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+                result[index++] = _appointments[i];
+        }
+
+        return result;
+    }
+
+    public void DisplayAppointment(Appointment appointment)
+    {
+        Console.WriteLine(appointment);
+    }
     public Appointment[] GetAll()
     {
         Appointment[] result = new Appointment[_count];
