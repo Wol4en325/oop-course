@@ -1,4 +1,4 @@
-using ClinicApp.Utils;
+﻿using ClinicApp.Utils;
 using ClinicApp.Managers;
 using ClinicApp.Enums;
 using ClinicApp.Interfaces;
@@ -70,9 +70,19 @@ public class Appointment : IPayable, ICancellable
         Id = _nextId++;
     }
 
-    public decimal GetCost()
+    public virtual decimal GetCost()
     {
         return DurationMinutes * 10m;
+    }
+
+    public virtual string GetDescription()
+    {
+        return "Appointment";
+    }
+
+    public int GetPriority()
+    {
+        return 3;
     }
 
     public void MarkPaid()
@@ -113,10 +123,12 @@ public class Appointment : IPayable, ICancellable
 
     public override string ToString()
     {
-        string result = "[" + Id + "] Patient #" + PatientId + " -> Doctor #" + DoctorId;
+        string result = "[" + Id + "] " + GetDescription();
+        result += " | Patient #" + PatientId + " -> Doctor #" + DoctorId;
         result += " | " + ScheduledAt.ToString("dd.MM.yyyy HH:mm");
         result += "-" + EndsAt.ToString("HH:mm");
         result += " | " + Status;
+        result += " | " + GetCost().ToString("F2") + " UAH";
 
         if (Notes.Length > 0)
         {
@@ -126,3 +138,4 @@ public class Appointment : IPayable, ICancellable
         return result;
     }
 }
+
