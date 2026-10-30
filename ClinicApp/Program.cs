@@ -272,8 +272,43 @@ void AppointmentsMenu(Clinic clinic)
                 Console.Write("Duration in minutes: ");
                 int duration = int.Parse(Console.ReadLine() ?? "");
 
-                Appointment appointment = new Appointment(patientId, doctorId, scheduledAt, duration);
-                clinic.Appointments.Add(appointment);
+                Console.WriteLine("Appointment types:");
+                Console.WriteLine("1. Regular");
+                Console.WriteLine("2. Urgent");
+                Console.WriteLine("3. Specialist");
+                Console.Write("Choose type: ");
+                string appointmentType = Console.ReadLine() ?? "";
+
+                Appointment appointment;
+
+                switch (appointmentType)
+                {
+                    case "2":
+                        Console.Write("Urgency reason: ");
+                        string urgencyNote = Console.ReadLine() ?? "";
+                        appointment = clinic.Appointments.BookUrgent(patientId, doctorId, scheduledAt, urgencyNote, duration);
+                        break;
+
+                    case "3":
+                        Console.Write("Consultation topic: ");
+                        string topic = Console.ReadLine() ?? "";
+                        appointment = clinic.Appointments.BookSpecialist(patientId, doctorId, scheduledAt, topic, duration);
+                        break;
+
+                    default:
+                        appointment = clinic.Appointments.Book(patientId, doctorId, scheduledAt, duration);
+                        break;
+                }
+
+                Console.WriteLine("Appointment added. ID: " + appointment.Id);
+                Console.WriteLine(appointment);
+
+                if (appointment is UrgentAppointment urgentAppointment)
+                {
+                    Appointment baseAppointment = urgentAppointment;
+                    Console.WriteLine("Priority through Appointment: " + baseAppointment.GetPriority());
+                    Console.WriteLine("Priority through UrgentAppointment: " + urgentAppointment.GetPriority());
+                }
 
                 Console.WriteLine("Appointment added. ID: " + appointment.Id);
                 break;
@@ -535,4 +570,5 @@ void ReportMenu(Clinic clinic)
     ShowMedicalRecordStatistics(clinic);
     Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
 }
+
 
