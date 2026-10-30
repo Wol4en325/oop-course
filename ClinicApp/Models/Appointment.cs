@@ -13,6 +13,8 @@ public class Appointment : IPayable, ICancellable
 
     public int Id { get; }
     public int PatientId { get; }
+    // Variant A: the base price applies the discount for all appointment types.
+    public decimal DiscountMultiplier { get; set; } = 1m;
     public int DoctorId { get; }
     public DateTime ScheduledAt { get; set; }
     public int DurationMinutes
@@ -72,7 +74,7 @@ public class Appointment : IPayable, ICancellable
 
     public virtual decimal GetCost()
     {
-        return DurationMinutes * 10m;
+        return DurationMinutes * 10m * DiscountMultiplier;
     }
 
     public virtual string GetDescription()
@@ -138,4 +140,7 @@ public class Appointment : IPayable, ICancellable
         return result;
     }
 }
+
+
+
 

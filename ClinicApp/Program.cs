@@ -301,6 +301,14 @@ void AppointmentsMenu(Clinic clinic)
                         break;
                 }
 
+                Console.Write("Is this a VIP patient? (y/n): ");
+                string vipChoice = Console.ReadLine() ?? "";
+
+                if (vipChoice.ToLower() == "y")
+                {
+                    appointment.DiscountMultiplier = 0.8m;
+                }
+
                 Console.WriteLine("Appointment added. ID: " + appointment.Id);
                 Console.WriteLine(appointment);
 
@@ -613,3 +621,4 @@ void ReportMenu(Clinic clinic)
     ShowMedicalRecordStatistics(clinic);
     Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
 }
+
