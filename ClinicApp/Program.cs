@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using ClinicApp;
 using ClinicApp.Enums;
 using ClinicApp.Models;
@@ -20,6 +20,7 @@ while (running)
     Console.WriteLine("4. Medical records - diagnoses, prescriptions");
     Console.WriteLine("5. Billing        - payments, debts");
     Console.WriteLine("6. Report         - overall statistics");
+    Console.WriteLine("7. Waiting queue  - patient queue");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -46,6 +47,9 @@ while (running)
                 break;
             case "6":
                 ReportMenu(clinic);
+                break;
+            case "7":
+                WaitingQueueMenu(clinic);
                 break;
             case "0":
                 running = false;
@@ -114,6 +118,9 @@ void PatientsMenu(Clinic clinic)
             case "2":
                 for (int i = 0; i < clinic.Patients.Count; i++)
                     Console.WriteLine(clinic.Patients[i]);
+                break;
+            case "7":
+                WaitingQueueMenu(clinic);
                 break;
             case "0":
                 menuRunning = false;
@@ -226,6 +233,9 @@ void DoctorsMenu(Clinic clinic)
 
                 break;
             }
+            case "7":
+                WaitingQueueMenu(clinic);
+                break;
             case "0":
                 menuRunning = false;
                 break;
@@ -386,6 +396,9 @@ void AppointmentsMenu(Clinic clinic)
                 Console.WriteLine("Cancelled appointments: " + cancelled);
                 break;
             }
+            case "7":
+                WaitingQueueMenu(clinic);
+                break;
             case "0":
                 menuRunning = false;
                 break;
@@ -502,6 +515,9 @@ void MedicalRecordsMenu(Clinic clinic)
             case "6":
                 ShowMedicalRecordStatistics(clinic);
                 break;
+            case "7":
+                WaitingQueueMenu(clinic);
+                break;
             case "0":
                 menuRunning = false;
                 break;
@@ -602,6 +618,9 @@ void BillingMenu(Clinic clinic)
             case "4":
                 Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
                 break;
+            case "7":
+                WaitingQueueMenu(clinic);
+                break;
             case "0":
                 menuRunning = false;
                 break;
@@ -622,3 +641,96 @@ void ReportMenu(Clinic clinic)
     Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
 }
 
+
+
+void WaitingQueueMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Waiting Queue ---");
+        Console.WriteLine("1. Add patient to queue");
+        Console.WriteLine("2. Show next patient");
+        Console.WriteLine("3. Call next patient");
+        Console.WriteLine("4. Show all patients in queue");
+        Console.WriteLine("5. Show queue count");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+            {
+                Console.Write("Patient ID: ");
+
+                if (!int.TryParse(Console.ReadLine(), out int patientId))
+                {
+                    Console.WriteLine("Invalid patient ID.");
+                    break;
+                }
+
+                Patient? patient = clinic.Patients.FindById(patientId);
+
+                if (patient == null)
+                {
+                    Console.WriteLine("Patient not found.");
+                    break;
+                }
+
+                clinic.WaitingPatients.Enqueue(patient);
+                Console.WriteLine("Patient added to waiting queue.");
+                break;
+            }
+            case "2":
+            {
+                if (clinic.WaitingPatients.IsEmpty)
+                {
+                    Console.WriteLine("Waiting queue is empty.");
+                    break;
+                }
+
+                Console.WriteLine("Next patient: " + clinic.WaitingPatients.Peek());
+                break;
+            }
+            case "3":
+            {
+                if (clinic.WaitingPatients.IsEmpty)
+                {
+                    Console.WriteLine("Waiting queue is empty.");
+                    break;
+                }
+
+                Patient nextPatient = clinic.WaitingPatients.Dequeue();
+                Console.WriteLine("Calling patient: " + nextPatient);
+                break;
+            }
+            case "4":
+            {
+                Patient[] patients = clinic.WaitingPatients.ToArray();
+
+                if (patients.Length == 0)
+                {
+                    Console.WriteLine("Waiting queue is empty.");
+                    break;
+                }
+
+                for (int i = 0; i < patients.Length; i++)
+                {
+                    Console.WriteLine((i + 1) + ". " + patients[i]);
+                }
+
+                break;
+            }
+            case "5":
+                Console.WriteLine("Patients in queue: " + clinic.WaitingPatients.Count);
+                break;
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+}
