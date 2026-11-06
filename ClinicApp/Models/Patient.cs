@@ -1,9 +1,10 @@
 using ClinicApp.Utils;
 using ClinicApp.Managers;
 using ClinicApp.Enums;
+using ClinicApp.Interfaces;
 namespace ClinicApp.Models;
 
-public class Patient
+public class Patient : IIdentifiable
 {
     private static int _nextId = 1;
 
@@ -138,3 +139,4 @@ public class Patient
         return "[" + Id + "] " + FullName + " | Age: " + ClinicFormatter.FormatAge(Age) + " (" + GetAgeCategory() + ") | Blood: " + ClinicFormatter.FormatBloodType(BloodType) + " | Phone: " + ClinicFormatter.FormatPhone(Phone);
     }
 }
+
