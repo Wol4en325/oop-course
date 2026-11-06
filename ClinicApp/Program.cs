@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using ClinicApp;
 using ClinicApp.Enums;
 using ClinicApp.Models;
@@ -19,7 +19,8 @@ while (running)
     Console.WriteLine("3. Appointments   - visits, cancellations");
     Console.WriteLine("4. Medical records - diagnoses, prescriptions");
     Console.WriteLine("5. Billing        - payments, debts");
-    Console.WriteLine("6. Report         - overall statistics");
+    Console.WriteLine("6. Waiting queue  - patient queue");
+    Console.WriteLine("7. Report         - overall statistics");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -44,8 +45,11 @@ while (running)
             case "5":
                 BillingMenu(clinic);
                 break;
-            case "6":
+            case "7":
                 ReportMenu(clinic);
+                break;
+            case "6":
+                WaitingRoomMenu(clinic);
                 break;
             case "0":
                 running = false;
@@ -115,6 +119,7 @@ void PatientsMenu(Clinic clinic)
                 for (int i = 0; i < clinic.Patients.Count; i++)
                     Console.WriteLine(clinic.Patients[i]);
                 break;
+
             case "0":
                 menuRunning = false;
                 break;
@@ -226,6 +231,7 @@ void DoctorsMenu(Clinic clinic)
 
                 break;
             }
+
             case "0":
                 menuRunning = false;
                 break;
@@ -246,6 +252,7 @@ void AppointmentsMenu(Clinic clinic)
         Console.WriteLine("1. Make appointment");
         Console.WriteLine("2. Show appointments");
         Console.WriteLine("8. Cancel all appointments for a patient");
+        Console.WriteLine("9. Filter appointments by type");
         Console.WriteLine("0. Back");
         Console.Write("Choose option: ");
 
@@ -272,16 +279,101 @@ void AppointmentsMenu(Clinic clinic)
                 Console.Write("Duration in minutes: ");
                 int duration = int.Parse(Console.ReadLine() ?? "");
 
-                Appointment appointment = new Appointment(patientId, doctorId, scheduledAt, duration);
-                clinic.Appointments.Add(appointment);
+                Console.WriteLine("Appointment types:");
+                Console.WriteLine("1. Regular");
+                Console.WriteLine("2. Urgent");
+                Console.WriteLine("3. Specialist");
+                Console.Write("Choose type: ");
+                string appointmentType = Console.ReadLine() ?? "";
+
+                Appointment appointment;
+
+                switch (appointmentType)
+                {
+                    case "2":
+                        Console.Write("Urgency reason: ");
+                        string urgencyNote = Console.ReadLine() ?? "";
+                        appointment = clinic.Appointments.BookUrgent(patientId, doctorId, scheduledAt, urgencyNote, duration);
+                        break;
+
+                    case "3":
+                        Console.Write("Consultation topic: ");
+                        string topic = Console.ReadLine() ?? "";
+                        appointment = clinic.Appointments.BookSpecialist(patientId, doctorId, scheduledAt, topic, duration);
+                        break;
+
+                    default:
+                        appointment = clinic.Appointments.Book(patientId, doctorId, scheduledAt, duration);
+                        break;
+                }
+
+                Console.Write("Is this a VIP patient? (y/n): ");
+                string vipChoice = Console.ReadLine() ?? "";
+
+                if (vipChoice.ToLower() == "y")
+                {
+                    appointment.DiscountMultiplier = 0.8m;
+                }
 
                 Console.WriteLine("Appointment added. ID: " + appointment.Id);
+                Console.WriteLine(appointment);
+
+                if (appointment is UrgentAppointment urgentAppointment)
+                {
+                    Appointment baseAppointment = urgentAppointment;
+                    Console.WriteLine("Priority through Appointment: " + baseAppointment.GetPriority());
+                    Console.WriteLine("Priority through UrgentAppointment: " + urgentAppointment.GetPriority());
+                }
                 break;
             }
             case "2":
                 for (int i = 0; i < clinic.Appointments.Count; i++)
                     Console.WriteLine(clinic.Appointments[i]);
                 break;
+
+            case "9":
+            {
+                Console.WriteLine("1. Regular appointments");
+                Console.WriteLine("2. Urgent appointments");
+                Console.WriteLine("3. Specialist appointments");
+                Console.Write("Choose type: ");
+
+                string type = Console.ReadLine() ?? "";
+                Appointment[] filteredAppointments = Array.Empty<Appointment>();
+
+                switch (type)
+                {
+                    case "1":
+                        filteredAppointments = clinic.Appointments.GetRegular();
+                        break;
+                    case "2":
+                        filteredAppointments = clinic.Appointments.GetUrgent();
+                        break;
+                    case "3":
+                        filteredAppointments = clinic.Appointments.GetSpecialist();
+                        break;
+                    default:
+                        Console.WriteLine("Unknown appointment type.");
+                        break;
+                }
+
+                if (type == "1" || type == "2" || type == "3")
+                {
+                    if (filteredAppointments.Length == 0)
+                    {
+                        Console.WriteLine("No appointments found.");
+                    }
+                    else
+                    {
+                        foreach (Appointment item in filteredAppointments)
+                        {
+                            clinic.Appointments.DisplayAppointment(item);
+                        }
+                    }
+                }
+
+                break;
+            }
             case "8":
             {
                 Console.Write("Patient ID: ");
@@ -300,6 +392,7 @@ void AppointmentsMenu(Clinic clinic)
                 Console.WriteLine("Cancelled appointments: " + cancelled);
                 break;
             }
+
             case "0":
                 menuRunning = false;
                 break;
@@ -416,6 +509,7 @@ void MedicalRecordsMenu(Clinic clinic)
             case "6":
                 ShowMedicalRecordStatistics(clinic);
                 break;
+
             case "0":
                 menuRunning = false;
                 break;
@@ -516,6 +610,7 @@ void BillingMenu(Clinic clinic)
             case "4":
                 Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
                 break;
+
             case "0":
                 menuRunning = false;
                 break;
@@ -536,3 +631,98 @@ void ReportMenu(Clinic clinic)
     Console.WriteLine("Total clinic debt: " + clinic.Billing.GetTotalDebt().ToString("F2") + " UAH");
 }
 
+
+
+void WaitingRoomMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Waiting Room ---");
+        Console.WriteLine("1. Add patient to queue");
+        Console.WriteLine("2. Accept first patient");
+        Console.WriteLine("3. Who is first?");
+        Console.WriteLine("4. Show all patients in queue");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+            {
+                Console.Write("Patient ID: ");
+
+                if (!int.TryParse(Console.ReadLine(), out int patientId))
+                {
+                    Console.WriteLine("Invalid patient ID.");
+                    break;
+                }
+
+                Patient? patient = clinic.Patients.FindById(patientId);
+
+                if (patient == null)
+                {
+                    Console.WriteLine("Patient not found.");
+                    break;
+                }
+
+                clinic.WaitingRoom.Enqueue(patient);
+                Console.WriteLine(patient.FullName + " added to the waiting room.");
+                break;
+            }
+            case "2":
+            {
+                try
+                {
+                    Patient patient = clinic.WaitingRoom.Dequeue();
+                    Console.WriteLine("Accepted: " + patient.FullName);
+                    Console.WriteLine("Patients remaining: " + clinic.WaitingRoom.Count);
+                }
+                catch (InvalidOperationException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                break;
+            }
+            case "3":
+            {
+                try
+                {
+                    Patient patient = clinic.WaitingRoom.Peek();
+                    Console.WriteLine("First patient: " + patient.FullName);
+                }
+                catch (InvalidOperationException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                break;
+            }
+            case "4":
+            {
+                Patient[] patients = clinic.WaitingRoom.ToArray();
+
+                if (patients.Length == 0)
+                {
+                    Console.WriteLine("Waiting room is empty.");
+                    break;
+                }
+
+                for (int i = 0; i < patients.Length; i++)
+                {
+                    Console.WriteLine((i + 1) + ". " + patients[i].FullName);
+                }
+
+                break;
+            }
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+}

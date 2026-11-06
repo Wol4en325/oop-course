@@ -4,7 +4,7 @@ using ClinicApp.Enums;
 using ClinicApp.Interfaces;
 namespace ClinicApp.Models;
 
-public class Appointment : IPayable, ICancellable
+public class Appointment : IPayable, ICancellable, IIdentifiable
 {
     private static int _nextId = 1;
 
@@ -13,6 +13,8 @@ public class Appointment : IPayable, ICancellable
 
     public int Id { get; }
     public int PatientId { get; }
+    // Variant A: the base price applies the discount for all appointment types.
+    public decimal DiscountMultiplier { get; set; } = 1m;
     public int DoctorId { get; }
     public DateTime ScheduledAt { get; set; }
     public int DurationMinutes
@@ -70,9 +72,19 @@ public class Appointment : IPayable, ICancellable
         Id = _nextId++;
     }
 
-    public decimal GetCost()
+    public virtual decimal GetCost()
     {
-        return DurationMinutes * 10m;
+        return DurationMinutes * 10m * DiscountMultiplier;
+    }
+
+    public virtual string GetDescription()
+    {
+        return "Appointment";
+    }
+
+    public int GetPriority()
+    {
+        return 3;
     }
 
     public void MarkPaid()
@@ -113,10 +125,12 @@ public class Appointment : IPayable, ICancellable
 
     public override string ToString()
     {
-        string result = "[" + Id + "] Patient #" + PatientId + " -> Doctor #" + DoctorId;
+        string result = "[" + Id + "] " + GetDescription();
+        result += " | Patient #" + PatientId + " -> Doctor #" + DoctorId;
         result += " | " + ScheduledAt.ToString("dd.MM.yyyy HH:mm");
         result += "-" + EndsAt.ToString("HH:mm");
         result += " | " + Status;
+        result += " | " + GetCost().ToString("F2") + " UAH";
 
         if (Notes.Length > 0)
         {
@@ -126,3 +140,8 @@ public class Appointment : IPayable, ICancellable
         return result;
     }
 }
+
+
+
+
+

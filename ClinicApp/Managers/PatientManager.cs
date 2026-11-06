@@ -1,19 +1,20 @@
-﻿using ClinicApp.Utils;
+using System;
+using System.Collections.Generic;
+using ClinicApp.Utils;
 using ClinicApp.Models;
 using ClinicApp.Enums;
+
 namespace ClinicApp.Managers;
 
 public class PatientManager
 {
-    private const int InitialCapacity = 4;
-    private Patient[] _patients;
-    private int _count;
+    private List<Patient> _patients;
 
     public int Count
     {
         get
         {
-            return _count;
+            return _patients.Count;
         }
     }
 
@@ -21,56 +22,42 @@ public class PatientManager
     {
         get
         {
-            if (index < 0 || index >= _count)
+            if (index < 0 || index >= _patients.Count)
             {
                 return null;
             }
+
             return _patients[index];
         }
     }
 
     public PatientManager()
     {
-        _patients = new Patient[InitialCapacity];
-        _count = 0;
+        _patients = new List<Patient>();
     }
 
     public void Add(Patient patient)
     {
-        if (_count == _patients.Length)
-        {
-            Resize();
-        }
-
-        _patients[_count] = patient;
-        _count++;
-    }
-
-    private void Resize()
-    {
-        Patient[] newArray = new Patient[_patients.Length * 2];
-        for (int i = 0; i < _count; i++)
-        {
-            newArray[i] = _patients[i];
-        }
-        _patients = newArray;
+        _patients.Add(patient);
     }
 
     public Patient? FindById(int id)
     {
-        for (int i = 0; i < _count; i++)
+        for (int i = 0; i < _patients.Count; i++)
         {
             if (_patients[i].Id == id)
             {
                 return _patients[i];
             }
         }
+
         return null;
     }
 
     public bool TryFindById(int id, out Patient patient)
     {
         Patient? found = FindById(id);
+
         if (found != null)
         {
             patient = found;
@@ -81,30 +68,52 @@ public class PatientManager
         return false;
     }
 
+    public bool Remove(int id)
+    {
+        for (int i = 0; i < _patients.Count; i++)
+        {
+            if (_patients[i].Id == id)
+            {
+                _patients.RemoveAt(i);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Patient[] FindByName(string name)
+    {
+        List<Patient> result = new List<Patient>();
+
+        for (int i = 0; i < _patients.Count; i++)
+        {
+            if (_patients[i].FullName.Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                result.Add(_patients[i]);
+            }
+        }
+
+        return result.ToArray();
+    }
+
     public Patient[] FindByBloodType(BloodType bloodType)
     {
-        int foundCount = 0;
-        for (int i = 0; i < _count; i++)
+        List<Patient> result = new List<Patient>();
+
+        for (int i = 0; i < _patients.Count; i++)
         {
             if (_patients[i].BloodType == bloodType)
             {
-                foundCount++;
+                result.Add(_patients[i]);
             }
         }
 
-        Patient[] result = new Patient[foundCount];
-        int idx = 0;
-        for (int i = 0; i < _count; i++)
-        {
-            if (_patients[i].BloodType == bloodType)
-            {
-                result[idx++] = _patients[i];
-            }
-        }
+        return result.ToArray();
+    }
 
-        return result;
+    public Patient[] GetAll()
+    {
+        return _patients.ToArray();
     }
 }
-
-
-

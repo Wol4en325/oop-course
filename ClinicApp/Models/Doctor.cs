@@ -4,7 +4,7 @@ using ClinicApp.Enums;
 using ClinicApp.Interfaces;
 namespace ClinicApp.Models;
 
-public class Doctor : ISchedulable
+public class Doctor : ISchedulable, IIdentifiable
 {
     private static int _nextId = 1;
 
@@ -157,3 +157,4 @@ public class Doctor : ISchedulable
         return "[" + Id + "] " + FullName + " | " + ClinicFormatter.FormatSpeciality(Speciality) + " | " + LicenseNumber + " | Phone: " + ClinicFormatter.FormatPhone(Phone) + " | " + Schedule + " | " + status;
     }
 }
+

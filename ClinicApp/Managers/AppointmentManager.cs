@@ -1,4 +1,4 @@
-using ClinicApp.Enums;
+﻿using ClinicApp.Enums;
 using ClinicApp.Utils;
 using ClinicApp.Models;
 using ClinicApp.Interfaces;
@@ -41,7 +41,27 @@ public class AppointmentManager
         _count++;
     }
 
-    public Appointment[] GetByDate(DateTime date)
+        public RegularAppointment Book(int patientId, int doctorId, DateTime scheduledAt, int durationMinutes = 30)
+    {
+        RegularAppointment appointment = new RegularAppointment(patientId, doctorId, scheduledAt, durationMinutes);
+        Add(appointment);
+        return appointment;
+    }
+
+    public UrgentAppointment BookUrgent(int patientId, int doctorId, DateTime scheduledAt, string urgencyNote = "", int durationMinutes = 30)
+    {
+        UrgentAppointment appointment = new UrgentAppointment(patientId, doctorId, scheduledAt, urgencyNote, durationMinutes);
+        Add(appointment);
+        return appointment;
+    }
+
+    public SpecialistAppointment BookSpecialist(int patientId, int doctorId, DateTime scheduledAt, string topic = "", int durationMinutes = 45)
+    {
+        SpecialistAppointment appointment = new SpecialistAppointment(patientId, doctorId, scheduledAt, topic, durationMinutes);
+        Add(appointment);
+        return appointment;
+    }
+public Appointment[] GetByDate(DateTime date)
     {
         int foundCount = 0;
         for (int i = 0; i < _count; i++)
@@ -94,6 +114,76 @@ public class AppointmentManager
         }
 
         return result;
+    }
+    public Appointment[] GetUrgent()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is UrgentAppointment)
+                result[index++] = _appointments[i];
+        }
+
+        return result;
+    }
+
+    public Appointment[] GetSpecialist()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is SpecialistAppointment)
+                result[index++] = _appointments[i];
+        }
+
+        return result;
+    }
+
+    public Appointment[] GetRegular()
+    {
+        int count = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+                count++;
+        }
+
+        Appointment[] result = new Appointment[count];
+        int index = 0;
+
+        for (int i = 0; i < _count; i++)
+        {
+            if (_appointments[i] is RegularAppointment)
+                result[index++] = _appointments[i];
+        }
+
+        return result;
+    }
+
+    public void DisplayAppointment(Appointment appointment)
+    {
+        Console.WriteLine(appointment);
     }
     public Appointment[] GetAll()
     {
