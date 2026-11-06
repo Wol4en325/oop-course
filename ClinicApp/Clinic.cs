@@ -13,7 +13,7 @@ public class Clinic
     public AppointmentManager Appointments { get; } = new AppointmentManager();
     public MedicalRecordManager MedicalRecords { get; } = new MedicalRecordManager();
     public BillingManager Billing { get; }
-    public WaitingQueue<Patient> WaitingPatients { get; } = new WaitingQueue<Patient>();
+    public WaitingQueue<Patient> WaitingRoom { get; } = new WaitingQueue<Patient>();
 
     public Clinic(string name, string address)
     {
