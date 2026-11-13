@@ -4,6 +4,7 @@ using ClinicApp.Enums;
 using ClinicApp.Models;
 using ClinicApp.Interfaces;
 using ClinicApp.Managers;
+using ClinicApp.Comparators;
 
 Clinic clinic = new Clinic("City Health Clinic", "Main St. 12");
 
@@ -21,6 +22,7 @@ while (running)
     Console.WriteLine("5. Billing        - payments, debts");
     Console.WriteLine("6. Waiting queue  - patient queue");
     Console.WriteLine("7. Report         - overall statistics");
+    Console.WriteLine("8. Analytics      - sorted statistics");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -47,6 +49,9 @@ while (running)
                 break;
             case "7":
                 ReportMenu(clinic);
+                break;
+            case "8":
+                AnalyticsMenu(clinic);
                 break;
             case "6":
                 WaitingRoomMenu(clinic);
@@ -725,4 +730,90 @@ void WaitingRoomMenu(Clinic clinic)
                 break;
         }
     }
+}
+void AnalyticsMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Analytics ---");
+        Console.WriteLine("1. Doctors by appointment count");
+        Console.WriteLine("2. Doctors by revenue");
+        Console.WriteLine("3. Doctors by name");
+        Console.WriteLine("4. Patients by visit count");
+        Console.WriteLine("5. Patients by total spent");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+            {
+                List<DoctorStats> stats = CollectDoctorStats(clinic);
+                stats.Sort();
+                foreach (DoctorStats item in stats)
+                    Console.WriteLine(item);
+                break;
+            }
+            case "2":
+            {
+                List<DoctorStats> stats = CollectDoctorStats(clinic);
+                stats.Sort(new DoctorStatsByRevenue());
+                foreach (DoctorStats item in stats)
+                    Console.WriteLine(item);
+                break;
+            }
+            case "3":
+            {
+                List<DoctorStats> stats = CollectDoctorStats(clinic);
+                stats.Sort(new DoctorStatsByName());
+                foreach (DoctorStats item in stats)
+                    Console.WriteLine(item);
+                break;
+            }
+            case "4":
+            {
+                List<PatientStats> stats = CollectPatientStats(clinic);
+                stats.Sort();
+                foreach (PatientStats item in stats)
+                    Console.WriteLine(item);
+                break;
+            }
+            case "5":
+            {
+                List<PatientStats> stats = CollectPatientStats(clinic);
+                stats.Sort(new PatientStatsBySpent());
+                foreach (PatientStats item in stats)
+                    Console.WriteLine(item);
+                break;
+            }
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+}
+
+List<DoctorStats> CollectDoctorStats(Clinic clinic)
+{
+    List<DoctorStats> stats = new List<DoctorStats>();
+
+    foreach (DoctorStats item in clinic.Analytics.ComputeDoctorStats())
+        stats.Add(item);
+
+    return stats;
+}
+
+List<PatientStats> CollectPatientStats(Clinic clinic)
+{
+    List<PatientStats> stats = new List<PatientStats>();
+
+    foreach (PatientStats item in clinic.Analytics.ComputePatientStats())
+        stats.Add(item);
+
+    return stats;
 }

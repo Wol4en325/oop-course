@@ -14,12 +14,14 @@ public class Clinic
     public MedicalRecordManager MedicalRecords { get; } = new MedicalRecordManager();
     public BillingManager Billing { get; }
     public WaitingQueue<Patient> WaitingRoom { get; } = new WaitingQueue<Patient>();
+    public AnalyticsManager Analytics { get; }
 
     public Clinic(string name, string address)
     {
         Name = name;
         Address = address;
         Billing = new BillingManager(Appointments);
+        Analytics = new AnalyticsManager(Appointments, Doctors, Patients);
     }
 
     public Clinic() : this("Default Clinic", "Unknown")
