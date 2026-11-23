@@ -5,6 +5,7 @@ using ClinicApp.Models;
 using ClinicApp.Interfaces;
 using ClinicApp.Managers;
 using ClinicApp.Comparators;
+using ClinicApp.Utils;
 
 Clinic clinic = new Clinic("City Health Clinic", "Main St. 12");
 
@@ -23,6 +24,7 @@ while (running)
     Console.WriteLine("6. Waiting queue  - patient queue");
     Console.WriteLine("7. Report         - overall statistics");
     Console.WriteLine("8. Analytics      - sorted statistics");
+    Console.WriteLine("9. Treatment plans - patient treatment plans");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -52,6 +54,9 @@ while (running)
                 break;
             case "8":
                 AnalyticsMenu(clinic);
+                break;
+            case "9":
+                TreatmentPlansMenu(clinic);
                 break;
             case "6":
                 WaitingRoomMenu(clinic);
@@ -816,4 +821,148 @@ List<PatientStats> CollectPatientStats(Clinic clinic)
         stats.Add(item);
 
     return stats;
+}
+
+void TreatmentPlansMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Treatment Plans ---");
+        Console.WriteLine("1. Show all treatment plans");
+        Console.WriteLine("2. Add treatment plan");
+        Console.WriteLine("3. Show plans by patient");
+        Console.WriteLine("4. Activate treatment plan");
+        Console.WriteLine("5. Complete treatment plan");
+        Console.WriteLine("6. Cancel treatment plan");
+        Console.WriteLine("7. Show TreatmentPlan model info");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+            {
+                TreatmentPlan[] plans = clinic.TreatmentPlans.GetAll();
+
+                if (plans.Length == 0)
+                {
+                    Console.WriteLine("No treatment plans found.");
+                    break;
+                }
+
+                foreach (TreatmentPlan plan in plans)
+                {
+                    Console.WriteLine(plan);
+                }
+
+                break;
+            }
+            case "2":
+            {
+                TreatmentPlan plan = FormBuilder.Build<TreatmentPlan>();
+
+                if (clinic.Patients.FindById(plan.PatientId) == null)
+                {
+                    Console.WriteLine("Patient not found. Treatment plan was not added.");
+                    break;
+                }
+
+                if (clinic.TreatmentPlans.Add(plan))
+                {
+                    Console.WriteLine("Treatment plan added. ID: " + plan.Id);
+                }
+
+                break;
+            }
+            case "3":
+            {
+                Console.Write("Patient ID: ");
+
+                if (!int.TryParse(Console.ReadLine(), out int patientId))
+                {
+                    Console.WriteLine("Invalid patient ID.");
+                    break;
+                }
+
+                TreatmentPlan[] plans = clinic.TreatmentPlans.GetByPatient(patientId);
+
+                if (plans.Length == 0)
+                {
+                    Console.WriteLine("No treatment plans found for this patient.");
+                    break;
+                }
+
+                foreach (TreatmentPlan plan in plans)
+                {
+                    Console.WriteLine(plan);
+                }
+
+                break;
+            }
+            case "4":
+                ChangeTreatmentPlanStatus(clinic, 1);
+                break;
+            case "5":
+                ChangeTreatmentPlanStatus(clinic, 2);
+                break;
+            case "6":
+                ChangeTreatmentPlanStatus(clinic, 3);
+                break;
+            case "7":
+                ModelValidator.PrintInfo(typeof(TreatmentPlan));
+                break;
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
+    }
+}
+
+void ChangeTreatmentPlanStatus(Clinic clinic, int action)
+{
+    Console.Write("Treatment plan ID: ");
+
+    if (!int.TryParse(Console.ReadLine(), out int id))
+    {
+        Console.WriteLine("Invalid treatment plan ID.");
+        return;
+    }
+
+    TreatmentPlan? plan = clinic.TreatmentPlans.GetById(id);
+
+    if (plan == null)
+    {
+        Console.WriteLine("План не знайдено");
+        return;
+    }
+
+    bool changed = false;
+
+    if (action == 1)
+    {
+        changed = plan.Activate();
+    }
+    else if (action == 2)
+    {
+        changed = plan.Complete();
+    }
+    else if (action == 3)
+    {
+        changed = plan.Cancel();
+    }
+
+    if (changed)
+    {
+        Console.WriteLine("Treatment plan status updated.");
+        Console.WriteLine(plan);
+    }
+    else
+    {
+        Console.WriteLine("This status transition is not allowed.");
+    }
 }
