@@ -9,44 +9,27 @@ public static class ModelValidator
     public static ValidationResult Validate(object obj)
     {
         ValidationResult result = new ValidationResult();
-        Type type = obj.GetType();
 
-        PropertyInfo[] properties = type.GetProperties();
-
-        foreach (PropertyInfo prop in properties)
+        foreach (PropertyInfo prop in obj.GetType().GetProperties())
         {
             object? value = prop.GetValue(obj);
 
             RequiredAttribute? required = prop.GetCustomAttribute<RequiredAttribute>();
-
-            if (required != null)
+            if (required != null && (value == null || (value is string text && string.IsNullOrWhiteSpace(text))))
             {
-                if (value == null || (value is string text && string.IsNullOrWhiteSpace(text)))
-                {
-                    result.AddError($"{prop.Name}: {required.ErrorMessage}");
-                }
+                result.AddError($"{prop.Name}: {required.ErrorMessage}");
             }
 
             MaxLengthAttribute? maxLength = prop.GetCustomAttribute<MaxLengthAttribute>();
-
-            if (maxLength != null && value is string str)
+            if (maxLength != null && value is string str && str.Length > maxLength.Length)
             {
-                if (str.Length > maxLength.Length)
-                {
-                    result.AddError($"{prop.Name}: {maxLength.ErrorMessage}");
-                }
+                result.AddError($"{prop.Name}: {maxLength.ErrorMessage}");
             }
 
             MinValueAttribute? minValue = prop.GetCustomAttribute<MinValueAttribute>();
-
-            if (minValue != null && value != null)
+            if (minValue != null && value != null && Convert.ToDouble(value) < minValue.Min)
             {
-                double number = Convert.ToDouble(value);
-
-                if (number < minValue.Min)
-                {
-                    result.AddError($"{prop.Name}: {minValue.ErrorMessage}");
-                }
+                result.AddError($"{prop.Name}: {minValue.ErrorMessage}");
             }
         }
 
@@ -57,15 +40,11 @@ public static class ModelValidator
     {
         Console.WriteLine(type.Name);
 
-        PropertyInfo[] properties = type.GetProperties();
-
-        foreach (PropertyInfo prop in properties)
+        foreach (PropertyInfo prop in type.GetProperties())
         {
             Console.Write($"  {prop.Name}");
 
-            object[] attributes = prop.GetCustomAttributes().ToArray();
-
-            foreach (object attribute in attributes)
+            foreach (object attribute in prop.GetCustomAttributes())
             {
                 string attributeName = attribute.GetType().Name;
 
