@@ -25,6 +25,7 @@ while (running)
     Console.WriteLine("7. Report         - overall statistics");
     Console.WriteLine("8. Analytics      - sorted statistics");
     Console.WriteLine("9. Treatment plans - patient treatment plans");
+    Console.WriteLine("10. Files         - logs and reports");
     Console.WriteLine("0. Exit");
     Console.Write("Choose option: ");
 
@@ -61,11 +62,15 @@ while (running)
             case "6":
                 WaitingRoomMenu(clinic);
                 break;
+            case "10":
+                FilesMenu(clinic);
+                break;
             case "0":
                 running = false;
                 break;
             default:
                 Console.WriteLine("Unknown menu option.");
+                clinic.Logger.LogWarning("Unknown main menu option: " + choice);
                 break;
         }
     }
@@ -77,9 +82,10 @@ while (running)
     {
         Console.WriteLine("Error: " + e.Message);
     }
-    catch (FormatException)
+    catch (FormatException e)
     {
         Console.WriteLine("Error: Invalid input format.");
+        clinic.Logger.LogWarning("Invalid input format: " + e.Message);
     }
     catch (Exception e)
     {
@@ -121,6 +127,7 @@ void PatientsMenu(Clinic clinic)
 
                 Patient patient = new Patient(firstName, lastName, dateOfBirth, bloodType, phone);
                 clinic.Patients.Add(patient);
+                clinic.Logger.LogInfo("Patient added. ID: " + patient.Id);
 
                 Console.WriteLine("Patient added. ID: " + patient.Id);
                 break;
@@ -183,6 +190,7 @@ void DoctorsMenu(Clinic clinic)
                 Doctor doctor = new Doctor(firstName, lastName, speciality, licenseNumber, phone);
                 doctor.Schedule = schedule;
                 clinic.Doctors.Add(doctor);
+                clinic.Logger.LogInfo("Doctor added. ID: " + doctor.Id);
 
                 Console.WriteLine("Doctor added. ID: " + doctor.Id);
                 break;
@@ -326,6 +334,7 @@ void AppointmentsMenu(Clinic clinic)
                 }
 
                 Console.WriteLine("Appointment added. ID: " + appointment.Id);
+                clinic.Logger.LogInfo("Appointment created. ID: " + appointment.Id);
                 Console.WriteLine(appointment);
 
                 if (appointment is UrgentAppointment urgentAppointment)
@@ -399,6 +408,8 @@ void AppointmentsMenu(Clinic clinic)
                 string reason = Console.ReadLine() ?? "";
 
                 int cancelled = AppointmentManager.CancelAll(appointments, reason);
+                if (cancelled > 0)
+                    clinic.Logger.LogInfo("Cancelled appointments: " + cancelled);
                 Console.WriteLine("Cancelled appointments: " + cancelled);
                 break;
             }
@@ -611,9 +622,14 @@ void BillingMenu(Clinic clinic)
                 }
 
                 if (clinic.Billing.PayAppointment(appointmentId))
+                {
                     Console.WriteLine("Appointment paid.");
+                    clinic.Logger.LogInfo("Appointment paid. ID: " + appointmentId);
+                }
                 else
+                {
                     Console.WriteLine("Payment failed: appointment not found, already paid or cancelled.");
+                }
 
                 break;
             }
@@ -937,7 +953,7 @@ void ChangeTreatmentPlanStatus(Clinic clinic, int action)
 
     if (plan == null)
     {
-        Console.WriteLine("План не знайдено");
+        Console.WriteLine("РџР»Р°РЅ РЅРµ Р·РЅР°Р№РґРµРЅРѕ");
         return;
     }
 
@@ -959,10 +975,64 @@ void ChangeTreatmentPlanStatus(Clinic clinic, int action)
     if (changed)
     {
         Console.WriteLine("Treatment plan status updated.");
+        clinic.Logger.LogInfo("Treatment plan status changed. ID: " + plan.Id);
         Console.WriteLine(plan);
     }
     else
     {
         Console.WriteLine("This status transition is not allowed.");
+    }
+}
+
+void FilesMenu(Clinic clinic)
+{
+    bool menuRunning = true;
+
+    while (menuRunning)
+    {
+        Console.WriteLine("\n--- Files ---");
+        Console.WriteLine("1. Show last log lines");
+        Console.WriteLine("2. Clear log");
+        Console.WriteLine("0. Back");
+        Console.Write("Choose option: ");
+
+        switch (Console.ReadLine())
+        {
+            case "1":
+            {
+                Console.Write("Number of lines: ");
+
+                if (!int.TryParse(Console.ReadLine(), out int count) || count <= 0)
+                {
+                    Console.WriteLine("Enter a positive number.");
+                    clinic.Logger.LogWarning("Invalid number entered for log display.");
+                    break;
+                }
+
+                string[] lines = clinic.Logger.GetLastLines(count);
+
+                if (lines.Length == 0)
+                {
+                    Console.WriteLine("Log is empty or does not exist.");
+                }
+                else
+                {
+                    foreach (string line in lines)
+                        Console.WriteLine(line);
+                }
+
+                break;
+            }
+            case "2":
+                clinic.Logger.Clear();
+                Console.WriteLine("Log cleared.");
+                break;
+            case "0":
+                menuRunning = false;
+                break;
+            default:
+                Console.WriteLine("Unknown menu option.");
+                break;
+        }
     }
 }
