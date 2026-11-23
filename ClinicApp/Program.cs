@@ -993,6 +993,7 @@ void FilesMenu(Clinic clinic)
         Console.WriteLine("\n--- Files ---");
         Console.WriteLine("1. Show last log lines");
         Console.WriteLine("2. Clear log");
+        Console.WriteLine("3. Export all reports");
         Console.WriteLine("0. Back");
         Console.Write("Choose option: ");
 
@@ -1027,6 +1028,17 @@ void FilesMenu(Clinic clinic)
                 clinic.Logger.Clear();
                 Console.WriteLine("Log cleared.");
                 break;
+            case "3":
+            {
+                string[] paths = clinic.Exporter.ExportAll();
+
+                Console.WriteLine("Reports exported:");
+
+                for (int i = 0; i < paths.Length; i++)
+                    Console.WriteLine(paths[i]);
+
+                break;
+            }
             case "0":
                 menuRunning = false;
                 break;

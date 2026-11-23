@@ -18,12 +18,14 @@ public class Clinic
     public AnalyticsManager Analytics { get; }
     public TreatmentPlanManager TreatmentPlans { get; } = new TreatmentPlanManager();
     public ClinicLogger Logger { get; }
+    public ClinicExporter Exporter { get; }
 
     public Clinic(string name, string address)
     {
         Name = name;
         Address = address;
         Logger = new ClinicLogger();
+        Exporter = new ClinicExporter(this);
         Billing = new BillingManager(Appointments);
         Analytics = new AnalyticsManager(Appointments, Doctors, Patients);
     }
