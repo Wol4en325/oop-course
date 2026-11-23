@@ -994,6 +994,7 @@ void FilesMenu(Clinic clinic)
         Console.WriteLine("1. Show last log lines");
         Console.WriteLine("2. Clear log");
         Console.WriteLine("3. Export all reports");
+        Console.WriteLine("4. Import patients from CSV");
         Console.WriteLine("0. Back");
         Console.Write("Choose option: ");
 
@@ -1036,6 +1037,29 @@ void FilesMenu(Clinic clinic)
 
                 for (int i = 0; i < paths.Length; i++)
                     Console.WriteLine(paths[i]);
+
+                break;
+            }
+            case "4":
+            {
+                Console.Write("CSV file path: ");
+                string? filePath = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(filePath))
+                {
+                    Console.WriteLine("File path cannot be empty.");
+                    break;
+                }
+
+                CsvImporter importer = new CsvImporter();
+                ImportResult result = importer.ImportPatients(clinic, filePath);
+
+                result.Print();
+
+                clinic.Logger.LogInfo(
+                    "CSV import completed. Imported: " + result.Imported +
+                    ", skipped: " + result.Skipped
+                );
 
                 break;
             }

@@ -1,0 +1,38 @@
+﻿using System.Collections.Generic;
+
+namespace ClinicApp.Utils;
+
+public class ImportResult
+{
+    private readonly List<string> _errors = new List<string>();
+
+    public int Imported { get; private set; }
+    public int Skipped { get; private set; }
+    public IReadOnlyList<string> Errors
+    {
+        get
+        {
+            return _errors.AsReadOnly();
+        }
+    }
+
+    public void AddSuccess()
+    {
+        Imported++;
+    }
+
+    public void AddError(int lineNumber, string reason)
+    {
+        Skipped++;
+        _errors.Add("Рядок " + lineNumber + ": " + reason);
+    }
+
+    public void Print()
+    {
+        Console.WriteLine("Imported: " + Imported);
+        Console.WriteLine("Skipped: " + Skipped);
+
+        for (int i = 0; i < _errors.Count; i++)
+            Console.WriteLine(_errors[i]);
+    }
+}
